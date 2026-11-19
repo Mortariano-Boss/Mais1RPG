@@ -1,0 +1,2459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#251240" />
+<meta name="description" content="+1 RPG — encontre jogadores, Mestres e campanhas de RPG de mesa. Mais uma pessoa. Mais uma aventura." />
+<title>+1 RPG — Mais uma pessoa. Mais uma aventura.</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23251240'/%3E%3Cpolygon points='32,6 55,19 55,45 32,58 9,45 9,19' fill='%232E1650' stroke='%23F7EDE0' stroke-width='2.5'/%3E%3Ctext x='32' y='38' text-anchor='middle' font-family='Arial' font-weight='900' font-size='16' fill='%238BE06F'%3E%2B1%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,700;0,900;1,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script>window.process = window.process || { env: { NODE_ENV: 'production' } };</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  if (window.tailwind) tailwind.config = {
+    theme: { extend: {
+      colors: {
+        violeta: { DEFAULT: '#251240', deep: '#1B0C30', darker: '#120626', mid: '#2E1650' },
+        creme: '#F7EDE0',
+        verde: { DEFAULT: '#267E1B', light: '#8BE06F', soft: '#a8ed96', dark: '#1E6515' },
+        grafite: '#25323A', arcana: '#8a4ec2', ouro: '#E8C56A',
+      },
+      fontFamily: { heading: ['Montserrat','sans-serif'], body: ['Inter','sans-serif'] },
+      boxShadow: { glow: '0 0 60px -15px rgba(38,126,27,0.5)', card: '0 24px 60px -24px rgba(18,6,38,0.85)' },
+      keyframes: {
+        'float-slow': { '0%,100%': { transform: 'translateY(0) rotate(-2deg)' }, '50%': { transform: 'translateY(-16px) rotate(2deg)' } },
+        'spin-slow': { to: { transform: 'rotate(360deg)' } },
+        twinkle: { '0%,100%': { opacity: '0.35', transform: 'scale(0.8)' }, '50%': { opacity: '1', transform: 'scale(1.1)' } },
+      },
+      animation: { 'float-slow': 'float-slow 7s ease-in-out infinite', 'spin-slow': 'spin-slow 22s linear infinite', twinkle: 'twinkle 3.2s ease-in-out infinite' },
+    } }
+  };
+</script>
+<style type="text/tailwindcss">
+  @layer base {
+    html { scroll-padding-top: 96px; scrollbar-gutter: stable; }
+    body { @apply bg-violeta text-creme font-body antialiased; overflow-x: hidden; font-optical-sizing: auto; }
+    ::selection { background: rgba(38,126,27,.5); color: #F7EDE0; }
+    * { scrollbar-width: thin; scrollbar-color: #267E1B #120626; }
+    *::-webkit-scrollbar { width: 10px; height: 10px; }
+    *::-webkit-scrollbar-track { background: #120626; }
+    *::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#2f9a22,#2E1650); border-radius: 999px; border: 2px solid #120626; }
+    *::-webkit-scrollbar-thumb:hover { background: #8BE06F; }
+    :focus-visible { outline: 2px solid #8BE06F; outline-offset: 3px; border-radius: 8px; }
+    body::after { content:''; position:fixed; inset:0; z-index:65; pointer-events:none; opacity:.045;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E"); }
+  }
+  @layer components {
+    .glass { background: rgba(37,18,64,.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(247,237,224,.1); }
+    .card-surface { background: #25323A; border: 1px solid rgba(247,237,224,.08); box-shadow: inset 0 1px 0 rgba(247,237,224,.05); }
+    .mask-line { display:block; overflow:hidden; padding-bottom:.08em; margin-bottom:-.08em; }
+    .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-full bg-verde px-7 py-3.5 font-heading font-bold text-creme; transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, background-color .25s; box-shadow: inset 0 1px 0 rgba(247,237,224,.18); }
+    .btn-primary:hover { background:#2f9a22; transform:translateY(-2px); box-shadow:0 14px 38px -10px rgba(38,126,27,.55), inset 0 1px 0 rgba(247,237,224,.18); }
+    .btn-primary:active { transform: translateY(0) scale(.98); }
+    .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-full border border-creme/30 px-7 py-3.5 font-heading font-bold text-creme; transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .25s, background-color .25s; }
+    .btn-ghost:hover { border-color:#F7EDE0; background:rgba(247,237,224,.08); transform:translateY(-2px); }
+    .btn-ghost:active { transform: translateY(0) scale(.98); }
+    .btn-dark { @apply inline-flex items-center justify-center gap-2 rounded-full bg-violeta px-7 py-3.5 font-heading font-bold text-creme; transition: transform .25s cubic-bezier(.22,1,.36,1), background-color .25s; }
+    .btn-dark:hover { background:#2E1650; transform:translateY(-2px); }
+    .lift { transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s, border-color .3s; }
+    .lift:hover { transform: translateY(-4px); box-shadow: 0 24px 60px -24px rgba(18,6,38,.85); border-color: rgba(247,237,224,.16); }
+    .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-creme/15 px-2.5 py-1 text-xs text-creme/70; }
+    .input { @apply w-full rounded-xl bg-violeta-mid/60 border border-creme/15 px-4 py-3 text-creme placeholder:text-creme/35 outline-none focus:border-verde-light; transition: border-color .25s, background-color .25s; }
+    .tnum { font-variant-numeric: tabular-nums; }
+  }
+  @layer utilities { .no-scrollbar { scrollbar-width:none; -ms-overflow-style:none; } .no-scrollbar::-webkit-scrollbar { display:none; } }
+</style>
+<style>
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-stopped { overflow: hidden; }
+  .marquee-track { display:flex; width:max-content; animation: marquee 46s linear infinite; }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .aurora { position:absolute; border-radius:50%; filter:blur(120px); pointer-events:none; animation: drift 26s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(70px,-50px) scale(1.18); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track, .animate-float-slow, .animate-spin-slow, .animate-twinkle, .animate-spin, .animate-pulse, .aurora { animation: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+<script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/framer-motion@10.18.0/dist/framer-motion.js"></script>
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<noscript>Você precisa habilitar o JavaScript para viver esta aventura com a +1 RPG.</noscript>
+
+<script type="text/babel" data-presets="react">
+/* =====================================================================
+   +1 RPG · Landing Page — edição profissional
+   React + Tailwind + Framer Motion + Lenis · ícones lucide (SVG oficial)
+   ===================================================================== */
+
+/* ---------- Movimento com fallback gracioso ---------- */
+const FM = window.Motion || window.framerMotion || window.FramerMotion || null;
+const mv = (v) => ({ get: () => v, on: () => () => {}, onChange: () => () => {} });
+const motion = FM ? FM.motion : new Proxy({}, { get: (_, tag) => React.forwardRef((props, ref) => {
+  const { initial, animate, exit, transition, whileInView, viewport, whileHover, whileTap, style, ...rest } = props;
+  const clean = style ? Object.fromEntries(Object.entries(style).map(([k, v]) => [k, v && typeof v.get === 'function' ? v.get() : v])) : undefined;
+  return React.createElement(tag, { ...rest, ref, style: clean });
+})});
+const AnimatePresence = FM ? FM.AnimatePresence : ({ children }) => <React.Fragment>{children}</React.Fragment>;
+const useReducedMotion = FM ? FM.useReducedMotion : () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const useScroll = FM ? FM.useScroll : () => ({ scrollYProgress: mv(0) });
+const useTransform = FM ? FM.useTransform : (s, i, o) => mv(Array.isArray(o) ? o[0] : 0);
+const useInView = FM ? FM.useInView : () => true;
+const animate = FM ? FM.animate : (a, b, opts) => { opts && opts.onUpdate && opts.onUpdate(b); return { stop() {} }; };
+
+/* ---------- Lenis + utilitários de scroll ---------- */
+let lenis = null, lockCount = 0;
+function initLenis() {
+  if (typeof window.Lenis === 'undefined') return () => {};
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {};
+  lenis = new window.Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
+  let raf; const loop = (t) => { lenis.raf(t); raf = requestAnimationFrame(loop); };
+  raf = requestAnimationFrame(loop);
+  return () => { cancelAnimationFrame(raf); lenis.destroy(); lenis = null; };
+}
+function scrollToId(id) {
+  const el = document.getElementById(id); if (!el) return;
+  if (lenis) lenis.scrollTo(el, { offset: -88, duration: 1.2 });
+  else el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+const handleAnchor = (e, id) => { e.preventDefault(); scrollToId(id); window.history.replaceState(null, '', '#' + id); };
+function lockScroll() { lockCount++; if (lenis) lenis.stop(); document.documentElement.style.overflow = 'hidden'; }
+function unlockScroll() { lockCount = Math.max(0, lockCount - 1); if (lockCount === 0) { if (lenis) lenis.start(); document.documentElement.style.overflow = ''; } }
+
+/* ---------- API tolerante a falhas ---------- */
+const BACKEND = window.REACT_APP_BACKEND_URL || '';
+async function request(path, options = {}) {
+  const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    const res = await fetch(BACKEND + path, { credentials: 'include', ...options, signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) } });
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) throw Object.assign(new Error('API indisponível'), { status: res.status });
+    const body = await res.json();
+    if (!res.ok) throw Object.assign(new Error(body?.message || 'Erro na API'), { status: res.status, body });
+    return body;
+  } finally { clearTimeout(timer); }
+}
+const apiGet = (p) => request(p);
+const apiPost = (p, b) => request(p, { method: 'POST', body: JSON.stringify(b || {}) });
+const formatBRL = (c) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((c || 0) / 100);
+function useApi(path, fallback) {
+  const [state, setState] = React.useState({ data: null, loading: true, error: false });
+  React.useEffect(() => {
+    let alive = true;
+    apiGet(path).then((d) => alive && setState({ data: d, loading: false, error: false }))
+      .catch(() => alive && setState({ data: fallback, loading: false, error: true }));
+    return () => { alive = false; };
+  }, [path]);
+  return state;
+}
+const readJSON = (k, f) => { try { return JSON.parse(localStorage.getItem(k)) ?? f; } catch (e) { return f; } };
+
+/* ---------- Ícones lucide (paths oficiais) ---------- */
+const LUCIDE = {
+  dices: '<rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01"/><path d="M10 14h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/>',
+  swords: '<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 10"/><line x1="5" x2="9" y1="14" y2="18"/><line x1="7" x2="4" y1="17" y2="20"/><line x1="3" x2="5" y1="19" y2="21"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  compass: '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+  sparkles: '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  'map-pin': '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  'arrow-right': '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  'arrow-up': '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  'chevron-left': '<path d="m15 18-6-6 6-6"/>',
+  'chevron-right': '<path d="m9 18 6-6-6-6"/>',
+  'chevron-down': '<path d="m6 9 6 6 6-6"/>',
+  menu: '<line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  'log-out': '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  quote: '<path d="M3 21c3 0 7-1 7-8V5c0-1.25-.76-2.02-2-2H4c-1.25 0-2 .75-2 1.97V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .01-1 1.03V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.76-2.02-2-2h-4c-1.25 0-2 .75-2 1.97V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>',
+  'shopping-cart': '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  monitor: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
+  facebook: '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
+  instagram: '<rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>',
+  'message-circle': '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  loader: '<path d="M21 12a9 9 0 1 1-6.22-8.56"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  minus: '<path d="M5 12h14"/>',
+  heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  calendar: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+  eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  'eye-off': '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  sliders: '<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
+  sort: '<path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/>',
+  mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+  package: '<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  book: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>',
+  map: '<path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/>',
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+};
+function Icon({ name, size = 18, className = '', fill = 'none', strokeWidth = 2 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth={strokeWidth}
+      strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"
+      dangerouslySetInnerHTML={{ __html: LUCIDE[name] || '' }} />
+  );
+}
+
+/* ---------- Marca ---------- */
+function Eyebrow({ icon, children, tone = 'dark', className = '' }) {
+  const color = tone === 'light' ? 'text-verde-dark' : 'text-verde-soft';
+  return (
+    <p className={`flex items-center gap-2 font-body text-sm font-semibold uppercase tracking-[0.2em] ${color} ${className}`}>
+      {icon && <Icon name={icon} size={16} />}{children}
+    </p>
+  );
+}
+function D20Svg({ size = 96, value = 20, variant = 'hero', className = '' }) {
+  const uid = React.useId().replace(/:/g, ''); const luck = variant === 'luck';
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <defs><linearGradient id={'d' + uid} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor={luck ? '#8a4ec2' : '#3a1e5c'} /><stop offset="1" stopColor={luck ? '#3a1e5c' : '#251240'} />
+      </linearGradient></defs>
+      <polygon points="32,3 58,18 58,46 32,61 6,46 6,18" fill={'url(#d' + uid + ')'} stroke={luck ? '#7ED957' : 'rgba(247,237,224,0.65)'} strokeWidth={luck ? 2.5 : 1.8} strokeLinejoin="round" />
+      <path d="M32 3 L17 22 M32 3 L47 22 M6 18 L17 22 M58 18 L47 22 M17 22 L47 22 M17 22 L32 48 M47 22 L32 48 M6 46 L32 48 M58 46 L32 48 M32 61 L32 48" stroke={luck ? 'rgba(247,237,224,0.4)' : 'rgba(247,237,224,0.35)'} strokeWidth="1.1" fill="none" />
+      <polygon points="17,22 47,22 32,48" fill={luck ? 'rgba(18,6,38,0.35)' : 'rgba(247,237,224,0.08)'} />
+      <text x="32" y="36" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize={luck ? 17 : 15} fill="#F7EDE0">{value}</text>
+    </svg>
+  );
+}
+function LogoMark({ size = 36 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+      <polygon points="32,4 57,18.5 57,45.5 32,60 7,45.5 7,18.5" fill="#2E1650" stroke="#F7EDE0" strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M32 4 L18 23 M32 4 L46 23 M7 18.5 L18 23 M57 18.5 L46 23 M18 23 L46 23 M18 23 L32 47 M46 23 L32 47 M7 45.5 L32 47 M57 45.5 L32 47 M32 60 L32 47" stroke="#8BE06F" strokeWidth="1.2" opacity="0.55" fill="none" />
+      <text x="32" y="37" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="15" fill="#F7EDE0">+1</text>
+    </svg>
+  );
+}
+function BrandLogo({ height = 38 }) {
+  return (
+    <span className="inline-flex items-center gap-2.5">
+      <LogoMark size={height} />
+      <span className="font-heading font-black tracking-tight text-creme" style={{ fontSize: height * 0.52 }}>+1 RPG</span>
+    </span>
+  );
+}
+
+/* ---------- Critin: mascote oficial (SVG refinado + fotos quando disponíveis) ---------- */
+function CritinEyes({ mood }) {
+  const g = '#7CFF5E';
+  const glow = { stroke: g, strokeWidth: 12, opacity: 0.3, fill: 'none', strokeLinecap: 'round' };
+  const line = { stroke: g, strokeWidth: 6.5, fill: 'none', strokeLinecap: 'round' };
+  if (mood === 'triste') return (<g>
+    <path d="M180 256 Q191 248 202 256" {...glow} /><path d="M218 256 Q229 248 240 256" {...glow} />
+    <path d="M180 256 Q191 248 202 256" {...line} /><path d="M218 256 Q229 248 240 256" {...line} />
+    <path d="M199 268 q-4 8 0 12 q5 -4 0 -12" fill="#8BE06F" opacity="0.85" />
+    <path d="M203 278 Q210 274 217 278" {...line} strokeWidth="4" opacity="0.8" />
+  </g>);
+  if (mood === 'preocupado') return (<g>
+    <path d="M181 250 L201 254" {...glow} /><path d="M219 254 L239 250" {...glow} />
+    <path d="M181 250 L201 254" {...line} /><path d="M219 254 L239 250" {...line} />
+    <path d="M178 236 Q190 230 202 236" {...line} strokeWidth="3.5" opacity="0.7" />
+    <path d="M218 236 Q230 230 242 236" {...line} strokeWidth="3.5" opacity="0.7" />
+    <path d="M252 226 q-5 9 0 13 q6 -4 0 -13" fill="#8BE06F" opacity="0.7" />
+  </g>);
+  if (mood === 'pensando') return (<g>
+    <path d="M182 246 Q192 234 202 244" {...glow} /><path d="M220 244 Q230 232 240 242" {...glow} />
+    <path d="M182 246 Q192 234 202 244" {...line} /><path d="M220 244 Q230 232 240 242" {...line} />
+    <circle cx="252" cy="212" r="3" fill={g} opacity="0.9" /><circle cx="262" cy="204" r="4" fill={g} opacity="0.7" /><circle cx="274" cy="194" r="5" fill={g} opacity="0.5" />
+  </g>);
+  if (mood === 'descansando') return (<g>
+    <path d="M182 252 L202 252" {...glow} /><path d="M218 252 L238 252" {...glow} />
+    <path d="M182 252 L202 252" {...line} /><path d="M218 252 L238 252" {...line} />
+    <text x="256" y="216" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="18" fill="#F7EDE0" opacity="0.75">z</text>
+    <text x="270" y="200" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="13" fill="#F7EDE0" opacity="0.5">z</text>
+  </g>);
+  if (mood === 'curioso') return (<g>
+    <path d="M180 250 Q191 236 202 250" {...glow} /><path d="M180 250 Q191 236 202 250" {...line} />
+    <circle cx="229" cy="248" r="13" fill={g} opacity="0.3" /><circle cx="229" cy="248" r="8.5" fill={g} />
+    <circle cx="232" cy="245" r="2.5" fill="#0D0716" />
+    <path d="M250 214 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z" fill="#a8ed96" />
+  </g>);
+  return (<g>
+    <path d="M180 250 Q191 234 202 250" {...glow} /><path d="M218 250 Q229 234 240 250" {...glow} />
+    <path d="M180 250 Q191 234 202 250" {...line} /><path d="M218 250 Q229 234 240 250" {...line} />
+    <path d="M202 272 Q210 279 218 272" {...line} strokeWidth="4.5" opacity="0.9" />
+  </g>);
+}
+function CritinSVG({ mood = 'feliz', pose = 'hero', dice = true, className = '', label }) {
+  const uid = React.useId().replace(/:/g, '');
+  const celebrate = pose === 'celebrate';
+  const dieX = celebrate ? 210 : 330, dieY = celebrate ? 104 : 190, dieR = celebrate ? 36 : 44;
+  const hex = (cx, cy, r) => `${cx},${cy - r} ${cx + r * 0.87},${cy - r * 0.5} ${cx + r * 0.87},${cy + r * 0.5} ${cx},${cy + r} ${cx - r * 0.87},${cy + r * 0.5} ${cx - r * 0.87},${cy - r * 0.5}`;
+  return (
+    <svg viewBox="0 0 420 560" className={className} role="img" aria-label={label || 'Critin, gato-mago mascote da +1 RPG'}>
+      <defs>
+        <linearGradient id={'robe' + uid} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7A3BC0" /><stop offset="1" stopColor="#4A1D78" /></linearGradient>
+        <linearGradient id={'hat' + uid} x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stopColor="#8A4EC2" /><stop offset="1" stopColor="#5A2596" /></linearGradient>
+        <linearGradient id={'die' + uid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#B16CE8" /><stop offset="1" stopColor="#5A2596" /></linearGradient>
+        <radialGradient id={'glow' + uid}><stop offset="0" stopColor="#B16CE8" stopOpacity="0.55" /><stop offset="1" stopColor="#B16CE8" stopOpacity="0" /></radialGradient>
+      </defs>
+      <ellipse cx="210" cy="534" rx="112" ry="14" fill="#120626" opacity="0.4" />
+      <path d="M128 470 C70 474 40 434 56 392 C66 364 96 352 114 366 C94 376 84 396 96 414 C106 430 126 436 138 430 Z" fill="#F3E3C8" />
+      <path d="M70 398 C74 380 90 370 104 372" stroke="#E3CBA4" strokeWidth="6" fill="none" strokeLinecap="round" />
+      <path d="M150 300 C138 342 126 402 116 464 Q210 490 304 464 C294 402 282 342 270 300 Q210 322 150 300 Z" fill={'url(#robe' + uid + ')'} />
+      <path d="M116 464 Q210 490 304 464 L304 476 Q210 502 116 476 Z" fill="#E8C56A" />
+      <path d="M124 476 Q210 500 296 476 L290 494 Q210 514 130 494 Z" fill="#1E6515" />
+      <path d="M186 314 L234 314 L246 456 Q210 466 174 456 Z" fill="#F7EDE0" />
+      <path d="M204 314 L216 314 L222 456 L198 456 Z" fill="#267E1B" opacity="0.9" />
+      <path d="M158 306 C150 360 140 410 132 458" stroke="#E8C56A" strokeWidth="4.5" fill="none" />
+      <path d="M262 306 C270 360 280 410 288 458" stroke="#E8C56A" strokeWidth="4.5" fill="none" />
+      <g stroke="#E8C56A" strokeWidth="2" fill="none" opacity="0.9">
+        <polygon points="160,414 172,421 172,435 160,442 148,435 148,421" />
+        <path d="M160 414 L154 424 M160 414 L166 424 M148 421 L154 424 M172 421 L166 424 M154 424 L166 424 M154 424 L160 436 M166 424 L160 436" />
+      </g>
+      <rect x="150" y="374" width="120" height="20" rx="6" fill="#7A4A2B" />
+      <rect x="196" y="370" width="28" height="28" rx="5" fill="none" stroke="#E8C56A" strokeWidth="5" />
+      <rect x="146" y="394" width="44" height="36" rx="10" fill="#8A5A36" />
+      <path d="M146 404 Q168 414 190 404" stroke="#5E3A20" strokeWidth="4" fill="none" />
+      <circle cx="168" cy="412" r="4" fill="#E8C56A" />
+      <path d="M148 492 Q144 516 168 519 L194 519 Q200 500 190 490 Z" fill="#2A1245" />
+      <path d="M272 492 Q276 516 252 519 L226 519 Q220 500 230 490 Z" fill="#2A1245" />
+      <circle cx="156" cy="516" r="7" fill="#F3E3C8" /><circle cx="170" cy="520" r="7" fill="#F3E3C8" /><circle cx="184" cy="517" r="7" fill="#F3E3C8" />
+      <circle cx="264" cy="516" r="7" fill="#F3E3C8" /><circle cx="250" cy="520" r="7" fill="#F3E3C8" /><circle cx="236" cy="517" r="7" fill="#F3E3C8" />
+      {celebrate ? (
+        <g>
+          <path d="M158 306 C128 300 110 286 98 268 L120 246 C132 262 146 272 164 278 Z" fill={'url(#robe' + uid + ')'} />
+          <path d="M98 268 L120 246 L108 234 L86 256 Z" fill="#E8C56A" />
+          <circle cx="100" cy="238" r="22" fill="#F3E3C8" />
+          <circle cx="86" cy="224" r="8" fill="#F3E3C8" /><circle cx="100" cy="218" r="8" fill="#F3E3C8" /><circle cx="114" cy="224" r="8" fill="#F3E3C8" />
+        </g>
+      ) : (
+        <g>
+          <path d="M156 306 C120 312 96 330 84 352 L108 376 C124 356 142 344 162 338 Z" fill={'url(#robe' + uid + ')'} />
+          <path d="M84 352 L108 376 L96 388 L72 364 Z" fill="#E8C56A" />
+          <path d="M84 366 L96 378 L88 386 L76 374 Z" fill="#1E6515" />
+          <circle cx="76" cy="336" r="30" fill="#F3E3C8" />
+          <circle cx="56" cy="316" r="10" fill="#F3E3C8" /><circle cx="76" cy="308" r="10" fill="#F3E3C8" /><circle cx="96" cy="316" r="10" fill="#F3E3C8" />
+          <ellipse cx="76" cy="342" rx="10" ry="8" fill="#3A2A28" />
+          <circle cx="58" cy="320" r="4.5" fill="#3A2A28" /><circle cx="76" cy="313" r="4.5" fill="#3A2A28" /><circle cx="94" cy="320" r="4.5" fill="#3A2A28" />
+        </g>
+      )}
+      <path d="M262 306 C292 300 310 286 322 268 L300 246 C288 262 274 272 256 278 Z" fill={'url(#robe' + uid + ')'} />
+      <path d="M322 268 L300 246 L312 234 L334 256 Z" fill="#E8C56A" />
+      <circle cx="322" cy="240" r="22" fill="#F3E3C8" />
+      <circle cx="210" cy="246" r="72" fill="#F3E3C8" />
+      <path d="M142 230 L114 242 L144 252 L120 266 L148 274 Z" fill="#F3E3C8" />
+      <path d="M278 230 L306 242 L276 252 L300 266 L272 274 Z" fill="#F3E3C8" />
+      <path d="M156 292 Q210 318 264 292 Q210 306 156 292" fill="#E3CBA4" />
+      <ellipse cx="210" cy="252" rx="52" ry="44" fill="#0D0716" />
+      <CritinEyes mood={mood} />
+      <path d="M148 200 Q210 224 272 200 L272 214 Q210 238 148 214 Z" fill="#000" opacity="0.15" />
+      <polygon points="210,306 222,318 210,330 198,318" fill="#2F8F23" stroke="#E8C56A" strokeWidth="3" />
+      <ellipse cx="210" cy="198" rx="116" ry="24" fill="#1E6515" />
+      <ellipse cx="210" cy="188" rx="118" ry="26" fill={'url(#hat' + uid + ')'} stroke="#E8C56A" strokeWidth="3" />
+      <path d="M132 178 C150 118 168 82 196 52 C204 42 220 40 228 52 C252 86 272 126 286 178 Q210 202 132 178 Z" fill={'url(#hat' + uid + ')'} />
+      <path d="M228 52 C252 86 272 126 286 178" stroke="#B16CE8" strokeWidth="3" opacity="0.5" fill="none" strokeLinecap="round" />
+      <path d="M196 52 C186 26 158 18 140 30 C150 40 162 42 170 40 C160 54 168 70 186 72 Z" fill="#5A2596" />
+      <path d="M136 170 Q210 192 284 170 L284 152 Q210 174 136 152 Z" fill="#2F8F23" />
+      <g stroke="#E8C56A" strokeWidth="2.5" fill="none">
+        <polygon points="210,148 222,155 222,169 210,176 198,169 198,155" />
+        <path d="M210 148 L204 158 M210 148 L216 158 M198 155 L204 158 M222 155 L216 158 M204 158 L216 158 M204 158 L210 170 M216 158 L210 170" />
+      </g>
+      <path d="M150 178 C136 166 122 168 118 180 C126 190 140 188 150 178 Z" fill="#2F8F23" />
+      <path d="M150 178 C142 192 128 198 120 192 C122 180 136 174 150 178 Z" fill="#267E1B" />
+      <circle cx="150" cy="178" r="5" fill="#1E6515" />
+      <line x1="150" y1="38" x2="144" y2="84" stroke="#E8C56A" strokeWidth="2.5" />
+      <polygon points="144,84 154,90 154,102 144,108 134,102 134,90" fill="#8a4ec2" stroke="#E8C56A" strokeWidth="2" />
+      <path d="M144 84 L139 92 M144 84 L149 92 M134 90 L139 92 M154 90 L149 92 M139 92 L149 92 M139 92 L144 102 M149 92 L144 102" stroke="#E8C56A" strokeWidth="1" fill="none" />
+      {dice && (
+        <g>
+          <circle cx={dieX} cy={dieY} r={dieR + 18} fill={'url(#glow' + uid + ')'} />
+          <path d={`M${dieX - 52} ${dieY - 34} C${dieX - 30} ${dieY - 66} ${dieX + 34} ${dieY - 68} ${dieX + 54} ${dieY - 36}`} stroke="#B16CE8" strokeWidth="5" fill="none" opacity="0.8" strokeLinecap="round" />
+          <path d={`M${dieX - 48} ${dieY + 40} C${dieX - 22} ${dieY + 64} ${dieX + 30} ${dieY + 62} ${dieX + 50} ${dieY + 34}`} stroke="#8a4ec2" strokeWidth="5" fill="none" opacity="0.7" strokeLinecap="round" />
+          <polygon points={hex(dieX, dieY, dieR)} fill={'url(#die' + uid + ')'} stroke="#E9D9FF" strokeWidth="2.5" strokeLinejoin="round" />
+          <path d={`M${dieX} ${dieY - dieR} L${dieX - 16} ${dieY - 10} M${dieX} ${dieY - dieR} L${dieX + 16} ${dieY - 10} M${dieX - dieR * 0.87} ${dieY - dieR * 0.5} L${dieX - 16} ${dieY - 10} M${dieX + dieR * 0.87} ${dieY - dieR * 0.5} L${dieX + 16} ${dieY - 10} M${dieX - 16} ${dieY - 10} L${dieX + 16} ${dieY - 10} M${dieX - 16} ${dieY - 10} L${dieX} ${dieY + 22} M${dieX + 16} ${dieY - 10} L${dieX} ${dieY + 22} M${dieX - dieR * 0.87} ${dieY + dieR * 0.5} L${dieX} ${dieY + 22} M${dieX + dieR * 0.87} ${dieY + dieR * 0.5} L${dieX} ${dieY + 22} M${dieX} ${dieY + dieR} L${dieX} ${dieY + 22}`} stroke="#E9D9FF" strokeWidth="1.3" opacity="0.7" fill="none" />
+          <text x={dieX} y={dieY + 7} textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize={dieR * 0.5} fill="#F7EDE0">20</text>
+          {!celebrate && (<g fill="#F3E3C8"><circle cx="310" cy="228" r="8" /><circle cx="324" cy="222" r="8" /><circle cx="338" cy="228" r="8" /></g>)}
+        </g>
+      )}
+      <g fill="#a8ed96">
+        <path d="M56 150 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z" className="animate-twinkle" />
+        <path d="M372 120 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" className="animate-twinkle" style={{ animationDelay: '1.2s' }} />
+        <path d="M390 330 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" className="animate-twinkle" style={{ animationDelay: '2s' }} />
+        <path d="M36 300 l2.5 7 7 2.5 -7 2.5 -2.5 7 -2.5 -7 -7 -2.5 7 -2.5 Z" className="animate-twinkle" style={{ animationDelay: '0.6s' }} />
+      </g>
+      {celebrate && (
+        <g>
+          <rect x="60" y="80" width="8" height="14" rx="2" fill="#8BE06F" transform="rotate(24 64 87)" />
+          <rect x="340" y="70" width="8" height="14" rx="2" fill="#E8C56A" transform="rotate(-18 344 77)" />
+          <circle cx="120" cy="60" r="5" fill="#E8C56A" /><circle cx="300" cy="52" r="5" fill="#8BE06F" />
+          <rect x="30" y="200" width="7" height="12" rx="2" fill="#F7EDE0" transform="rotate(40 33 206)" />
+          <rect x="386" y="210" width="7" height="12" rx="2" fill="#8BE06F" transform="rotate(-30 389 216)" />
+          <circle cx="46" cy="120" r="4" fill="#F7EDE0" /><circle cx="378" cy="160" r="4" fill="#E8C56A" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
+/* ---------- Artes dos temas (SVG 3:2) ---------- */
+const STARS = [[40,40,1.6],[90,120,1.2],[160,60,1.8],[230,30,1.2],[300,90,1.5],[370,50,1.2],[420,140,1.4],[500,40,1.8],[540,110,1.2],[570,60,1.5],[120,180,1.1],[480,200,1.2]];
+const Stars = ({ opacity = 0.7 }) => <g fill="#F7EDE0" opacity={opacity}>{STARS.map(([x,y,r],i) => <circle key={i} cx={x} cy={y} r={r} />)}</g>;
+const Spark = ({ x, y, s, fill = '#a8ed96', opacity = 1 }) => { const k = s * 0.18; return <path d={`M${x} ${y-s} Q${x+k} ${y-k} ${x+s} ${y} Q${x+k} ${y+k} ${x} ${y+s} Q${x-k} ${y+k} ${x-s} ${y} Q${x-k} ${y-k} ${x} ${y-s} Z`} fill={fill} opacity={opacity} />; };
+const CritinSil = ({ x = 0, y = 0, s = 1 }) => (
+  <g transform={`translate(${x} ${y}) scale(${s})`} fill="#120626">
+    <path d="M50 4 L80 46 L20 46 Z" /><ellipse cx="50" cy="46" rx="36" ry="9" />
+    <path d="M30 52 L22 34 L44 48 Z" /><path d="M70 52 L78 34 L56 48 Z" />
+    <circle cx="50" cy="66" r="21" /><path d="M28 82 Q50 74 72 82 L78 112 Q50 120 22 112 Z" />
+    <path d="M76 104 Q96 100 90 82" stroke="#120626" strokeWidth="7" fill="none" strokeLinecap="round" />
+    <circle cx="43" cy="64" r="2.6" fill="#8BE06F" /><circle cx="57" cy="64" r="2.6" fill="#8BE06F" />
+  </g>
+);
+function ThemeArtSvg({ slug, uid, className, label }) {
+  const u = uid;
+  const scenes = {
+    'fantasia-medieval-classica': (
+      <g>
+        <defs><linearGradient id={u+'s'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#2E1650"/><stop offset="1" stopColor="#120626"/></linearGradient></defs>
+        <rect width="600" height="400" fill={`url(#${u}s)`} /><Stars />
+        <circle cx="470" cy="92" r="70" fill="#F7EDE0" opacity="0.12" /><circle cx="470" cy="92" r="52" fill="#F7EDE0" opacity="0.9" />
+        <path d="M0 300 L120 190 L240 300 Z M180 310 L330 170 L480 310 Z M420 310 L540 210 L660 310 Z" fill="#1B0C30" />
+        <rect y="290" width="600" height="110" fill="#251240" />
+        <g fill="#1B0C30"><rect x="150" y="152" width="38" height="140"/><polygon points="144,152 169,112 194,152"/><rect x="188" y="212" width="120" height="80"/><rect x="308" y="140" width="42" height="152"/><polygon points="302,140 329,96 356,140"/><rect x="196" y="204" width="10" height="12"/><rect x="222" y="204" width="10" height="12"/><rect x="248" y="204" width="10" height="12"/><rect x="274" y="204" width="10" height="12"/></g>
+        <g fill="#8BE06F" opacity="0.85"><rect x="163" y="176" width="8" height="12" rx="3"/><rect x="322" y="164" width="8" height="12" rx="3"/><rect x="236" y="240" width="12" height="18" rx="5"/></g>
+        <CritinSil x={62} y={252} s={0.95} /><Spark x={110} y={236} s={12} /><Spark x={430} y={250} s={9} opacity={0.8} /><Spark x={540} y={330} s={7} opacity={0.6} />
+      </g>),
+    'cyberpunk-futurista': (
+      <g>
+        <defs><linearGradient id={u+'s'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#120626"/><stop offset="1" stopColor="#2E1650"/></linearGradient><linearGradient id={u+'b'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8BE06F" stopOpacity="0.3"/><stop offset="1" stopColor="#8BE06F" stopOpacity="0"/></linearGradient></defs>
+        <rect width="600" height="400" fill={`url(#${u}s)`} /><polygon points="430,0 470,0 560,400 360,400" fill={`url(#${u}b)`} />
+        <g fill="#1B0C30"><rect x="20" y="120" width="70" height="280"/><rect x="110" y="70" width="60" height="330"/><rect x="190" y="150" width="80" height="250"/><rect x="290" y="90" width="55" height="310"/><rect x="365" y="140" width="75" height="260"/><rect x="460" y="60" width="65" height="340"/><rect x="540" y="130" width="60" height="270"/></g>
+        <g fill="#8BE06F" opacity="0.8"><rect x="122" y="90" width="8" height="6"/><rect x="140" y="110" width="8" height="6"/><rect x="122" y="140" width="8" height="6"/><rect x="300" y="110" width="8" height="6"/><rect x="318" y="140" width="8" height="6"/><rect x="300" y="180" width="8" height="6"/><rect x="472" y="80" width="8" height="6"/><rect x="492" y="110" width="8" height="6"/><rect x="472" y="150" width="8" height="6"/></g>
+        <g fill="#b78ae0" opacity="0.8"><rect x="34" y="150" width="8" height="6"/><rect x="58" y="180" width="8" height="6"/><rect x="204" y="180" width="8" height="6"/><rect x="230" y="210" width="8" height="6"/><rect x="380" y="170" width="8" height="6"/><rect x="410" y="200" width="8" height="6"/><rect x="552" y="160" width="8" height="6"/></g>
+        <g fill="#F7EDE0" opacity="0.5"><rect x="150" y="200" width="8" height="6"/><rect x="250" y="250" width="8" height="6"/><rect x="420" y="240" width="8" height="6"/><rect x="500" y="220" width="8" height="6"/></g>
+        <rect x="196" y="118" width="66" height="22" rx="4" fill="none" stroke="#8BE06F" strokeWidth="2.5" opacity="0.9" /><line x1="204" y1="129" x2="254" y2="129" stroke="#8BE06F" strokeWidth="3" opacity="0.9" />
+        <line x1="370" y1="120" x2="436" y2="120" stroke="#8a4ec2" strokeWidth="4" opacity="0.9" /><line x1="118" y1="60" x2="118" y2="30" stroke="#1B0C30" strokeWidth="4" /><circle cx="118" cy="28" r="4" fill="#8BE06F" />
+        <ellipse cx="300" cy="398" rx="300" ry="40" fill="#8a4ec2" opacity="0.25" /><CritinSil x={40} y={262} s={0.9} /><Spark x={330} y={70} s={9} fill="#b78ae0" /><Spark x={560} y={44} s={7} />
+      </g>),
+    'terror-sobrenatural': (
+      <g>
+        <defs><linearGradient id={u+'s'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#120626"/><stop offset="1" stopColor="#1B0C30"/></linearGradient></defs>
+        <rect width="600" height="400" fill={`url(#${u}s)`} /><Stars opacity={0.4} />
+        <circle cx="150" cy="95" r="62" fill="#F7EDE0" opacity="0.1" /><circle cx="150" cy="95" r="48" fill="#F7EDE0" opacity="0.85" />
+        <g fill="#120626"><path d="M118 84 q7 -9 14 0 q-7 -3 -14 0 Z"/><path d="M158 104 q6 -8 12 0 q-6 -3 -12 0 Z"/><path d="M138 66 q5 -7 10 0 q-5 -2 -10 0 Z"/></g>
+        <ellipse cx="190" cy="110" rx="90" ry="14" fill="#251240" opacity="0.85" /><ellipse cx="110" cy="72" rx="70" ry="10" fill="#251240" opacity="0.7" />
+        <g fill="#120626"><rect x="420" y="180" width="120" height="150"/><polygon points="410,180 480,120 550,180"/><rect x="500" y="130" width="26" height="60"/><polygon points="496,130 513,104 530,130"/></g>
+        <rect x="452" y="216" width="14" height="20" rx="6" fill="#8BE06F" opacity="0.75" /><rect x="500" y="230" width="12" height="16" rx="5" fill="#8BE06F" opacity="0.4" />
+        <path d="M330 330 L330 220 M330 240 L300 200 M330 260 L364 216 M300 200 L286 178 M364 216 L380 196" stroke="#120626" strokeWidth="9" strokeLinecap="round" fill="none" />
+        <rect y="320" width="600" height="80" fill="#120626" />
+        <ellipse cx="180" cy="342" rx="180" ry="16" fill="#F7EDE0" opacity="0.05" /><ellipse cx="430" cy="366" rx="220" ry="18" fill="#F7EDE0" opacity="0.07" /><ellipse cx="300" cy="390" rx="320" ry="20" fill="#F7EDE0" opacity="0.05" />
+        <CritinSil x={210} y={252} s={0.95} /><circle cx="200" cy="300" r="5" fill="#8BE06F" opacity="0.35" /><circle cx="392" cy="286" r="4" fill="#8BE06F" opacity="0.3" /><Spark x={560} y={70} s={7} opacity={0.5} />
+      </g>),
+    'pos-apocalipse': (
+      <g>
+        <defs><linearGradient id={u+'s'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#2E1650"/><stop offset="0.7" stopColor="#3a1e5c"/><stop offset="1" stopColor="#1B0C30"/></linearGradient><linearGradient id={u+'t'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#267E1B" stopOpacity="0"/><stop offset="1" stopColor="#267E1B" stopOpacity="0.35"/></linearGradient></defs>
+        <rect width="600" height="400" fill={`url(#${u}s)`} />
+        <circle cx="452" cy="140" r="52" fill="#E8C56A" opacity="0.16" /><circle cx="452" cy="140" r="38" fill="#E8C56A" opacity="0.8" />
+        <path d="M96 96 q6 -6 12 0 M120 84 q5 -5 10 0" stroke="#F7EDE0" strokeWidth="2" opacity="0.35" fill="none" />
+        <g fill="#1B0C30"><polygon points="30,320 30,170 60,170 60,190 84,190 84,320"/><polygon points="110,320 110,140 150,128 150,200 172,200 172,320"/><polygon points="200,320 200,180 236,180 236,160 258,176 258,320"/><polygon points="300,320 316,150 344,156 336,320"/><polygon points="380,320 380,200 420,188 420,240 448,240 448,320"/><polygon points="500,320 500,170 540,182 540,320"/></g>
+        <rect y="250" width="600" height="150" fill={`url(#${u}t)`} /><rect y="316" width="600" height="84" fill="#120626" />
+        <path d="M60 350 L140 356 L200 348 M320 366 L400 358 L470 370 M240 384 L330 378" stroke="#251240" strokeWidth="4" fill="none" />
+        <ellipse cx="300" cy="330" rx="280" ry="14" fill="#F7EDE0" opacity="0.05" /><CritinSil x={70} y={250} s={0.95} />
+        <line x1="168" y1="270" x2="176" y2="356" stroke="#120626" strokeWidth="6" strokeLinecap="round" /><Spark x={520} y={90} s={8} fill="#E8C56A" opacity={0.8} /><Spark x={250} y={70} s={6} opacity={0.5} />
+      </g>),
+    'space-opera-sci-fi-espacial': (
+      <g>
+        <defs><radialGradient id={u+'s'} cx="0.5" cy="0.4" r="0.9"><stop offset="0" stopColor="#2E1650"/><stop offset="1" stopColor="#120626"/></radialGradient><linearGradient id={u+'p'} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#8a4ec2"/><stop offset="1" stopColor="#3a1e5c"/></linearGradient><filter id={u+'f'}><feGaussianBlur stdDeviation="22"/></filter></defs>
+        <rect width="600" height="400" fill={`url(#${u}s)`} />
+        <ellipse cx="180" cy="120" rx="150" ry="70" fill="#8a4ec2" opacity="0.2" filter={`url(#${u}f)`} /><ellipse cx="470" cy="300" rx="160" ry="70" fill="#267E1B" opacity="0.16" filter={`url(#${u}f)`} />
+        <Stars opacity={0.9} /><circle cx="430" cy="150" r="94" fill="#8a4ec2" opacity="0.12" /><circle cx="430" cy="150" r="78" fill={`url(#${u}p)`} />
+        <path d="M368 118 Q430 96 492 128 M362 160 Q430 140 498 172 M372 196 Q430 180 488 204" stroke="#F7EDE0" strokeWidth="4" opacity="0.25" fill="none" />
+        <ellipse cx="430" cy="150" rx="128" ry="26" fill="none" stroke="#F7EDE0" strokeWidth="6" opacity="0.55" transform="rotate(-16 430 150)" />
+        <circle cx="292" cy="84" r="13" fill="#F7EDE0" opacity="0.7" />
+        <polygon points="120,258 176,244 168,266" fill="#F7EDE0" /><circle cx="118" cy="258" r="6" fill="#8BE06F" opacity="0.9" /><path d="M112 258 L64 268" stroke="#8BE06F" strokeWidth="3" opacity="0.5" />
+        <ellipse cx="120" cy="352" rx="120" ry="34" fill="#1B0C30" /><CritinSil x={64} y={244} s={0.9} /><Spark x={230} y={200} s={9} /><Spark x={560} y={60} s={7} opacity={0.7} />
+      </g>),
+    'investigacao-policial-noir': (
+      <g>
+        <defs><linearGradient id={u+'s'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1B0C30"/><stop offset="1" stopColor="#120626"/></linearGradient><linearGradient id={u+'c'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#F7EDE0" stopOpacity="0.28"/><stop offset="1" stopColor="#F7EDE0" stopOpacity="0"/></linearGradient></defs>
+        <rect width="600" height="400" fill={`url(#${u}s)`} />
+        <g fill="#120626"><rect x="0" y="60" width="90" height="340"/><rect x="104" y="120" width="70" height="280"/><rect x="470" y="80" width="80" height="320"/><rect x="560" y="140" width="40" height="260"/></g>
+        <g fill="#F7EDE0" opacity="0.22"><rect x="20" y="90" width="10" height="14"/><rect x="52" y="130" width="10" height="14"/><rect x="20" y="180" width="10" height="14"/><rect x="120" y="150" width="10" height="14"/><rect x="148" y="200" width="10" height="14"/><rect x="490" y="110" width="10" height="14"/><rect x="520" y="160" width="10" height="14"/><rect x="490" y="220" width="10" height="14"/></g>
+        <rect x="112" y="96" width="52" height="18" rx="3" fill="none" stroke="#8BE06F" strokeWidth="2" opacity="0.8" /><line x1="120" y1="105" x2="156" y2="105" stroke="#8BE06F" strokeWidth="2.5" opacity="0.8" />
+        <polygon points="380,128 300,336 460,336" fill={`url(#${u}c)`} /><line x1="380" y1="128" x2="380" y2="336" stroke="#120626" strokeWidth="7" /><circle cx="380" cy="122" r="10" fill="#F7EDE0" opacity="0.95" />
+        <g transform="rotate(12 300 200)" stroke="#F7EDE0" strokeWidth="1.6" opacity="0.14">{[40,90,140,190,240,290,340,390,440,490,540].map((x) => <line key={x} x1={x} y1="0" x2={x} y2="400" />)}</g>
+        <rect y="330" width="600" height="70" fill="#120626" /><ellipse cx="380" cy="340" rx="95" ry="9" fill="#F7EDE0" opacity="0.1" />
+        <g fill="#120626"><rect x="292" y="238" width="44" height="8" rx="3"/><path d="M300 238 Q314 220 328 238 Z"/><circle cx="314" cy="252" r="11"/><path d="M298 262 L330 262 L338 330 L290 330 Z"/></g>
+        <CritinSil x={470} y={258} s={0.8} /><Spark x={210} y={70} s={6} opacity={0.4} />
+      </g>),
+  };
+  return (
+    <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" className={className} role="img" aria-label={label || 'Cena ilustrada do tema com o Critin'}>
+      {scenes[slug] || scenes['fantasia-medieval-classica']}
+    </svg>
+  );
+}
+
+/* ---------- Artes dos produtos ---------- */
+function MiniD20({ x, y, s, fill, stroke, num, numFill = '#F7EDE0' }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s})`}>
+      <polygon points="0,-30 26,-15 26,15 0,30 -26,15 -26,-15" fill={fill} stroke={stroke} strokeWidth="2" strokeLinejoin="round" />
+      <path d="M0 -30 L-14 -8 M0 -30 L14 -8 M-26 -15 L-14 -8 M26 -15 L14 -8 M-14 -8 L14 -8 M-14 -8 L0 18 M14 -8 L0 18 M-26 15 L0 18 M26 15 L0 18 M0 30 L0 18" stroke={stroke} strokeWidth="1" opacity="0.6" fill="none" />
+      {num && <text x="0" y="4" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="13" fill={numFill}>{num}</text>}
+    </g>
+  );
+}
+function ProductArtSvg({ art, uid, label }) {
+  const id = 'p' + uid;
+  const base = (children) => (
+    <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" className="h-full w-full" role="img" aria-label={label}>
+      <defs>
+        <radialGradient id={id+'b'} cx="0.5" cy="0.42" r="0.85"><stop offset="0" stopColor="#FFFDF8"/><stop offset="1" stopColor="#F0E3D0"/></radialGradient>
+        <linearGradient id={id+'d'} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#8a4ec2"/><stop offset="1" stopColor="#3a1e5c"/></linearGradient>
+      </defs>
+      <rect width="400" height="300" fill={`url(#${id}b)`} />
+      <circle cx="200" cy="150" r="118" fill="none" stroke="#251240" strokeWidth="1.5" opacity="0.08" />
+      <circle cx="200" cy="150" r="146" fill="none" stroke="#267E1B" strokeWidth="1.5" opacity="0.1" />
+      {children}
+    </svg>
+  );
+  if (art === 'moletom') return base(<g>
+    <ellipse cx="200" cy="248" rx="96" ry="12" fill="#251240" opacity="0.12" />
+    <path d="M142 118 L106 192 Q102 202 112 206 L138 214 L150 152 Z" fill="#251240" /><path d="M258 118 L294 192 Q298 202 288 206 L262 214 L250 152 Z" fill="#251240" />
+    <path d="M140 118 Q140 90 172 84 L228 84 Q260 90 260 118 L266 212 Q266 224 254 224 L146 224 Q134 224 134 212 Z" fill="#2E1650" />
+    <path d="M172 84 Q200 58 228 84 Q214 100 200 100 Q186 100 172 84 Z" fill="#1B0C30" /><path d="M180 86 Q200 70 220 86 Q210 94 200 94 Q190 94 180 86 Z" fill="#120626" />
+    <line x1="192" y1="98" x2="190" y2="126" stroke="#F7EDE0" strokeWidth="3" strokeLinecap="round" /><line x1="208" y1="98" x2="210" y2="126" stroke="#F7EDE0" strokeWidth="3" strokeLinecap="round" />
+    <rect x="168" y="182" width="64" height="34" rx="10" fill="#251240" /><MiniD20 x={200} y={148} s={0.85} fill="none" stroke="#8BE06F" num="+1" />
+    <rect x="134" y="216" width="132" height="10" rx="5" fill="#1B0C30" />
+  </g>);
+  if (art === 'camiseta') return base(<g>
+    <ellipse cx="200" cy="250" rx="92" ry="11" fill="#251240" opacity="0.12" />
+    <path d="M150 96 L176 80 Q200 94 224 80 L250 96 L274 132 L246 148 L246 216 Q246 226 236 226 L164 226 Q154 226 154 216 L154 148 L126 132 Z" fill="#F7EDE0" stroke="#25323A" strokeWidth="3" strokeLinejoin="round" />
+    <path d="M176 80 Q200 96 224 80 Q212 90 200 90 Q188 90 176 80 Z" fill="#E8DCC8" />
+    <MiniD20 x={200} y={150} s={0.95} fill="#2E1650" stroke="#8BE06F" num="+1" />
+    <text x="200" y="200" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="20" fill="#267E1B">RPG</text>
+  </g>);
+  if (art === 'dados-7') return base(<g>
+    <ellipse cx="200" cy="244" rx="120" ry="14" fill="#251240" opacity="0.12" />
+    <g transform="rotate(-12 128 190)"><rect x="104" y="166" width="48" height="48" rx="9" fill="#267E1B"/><circle cx="118" cy="180" r="4" fill="#F7EDE0"/><circle cx="138" cy="200" r="4" fill="#F7EDE0"/><circle cx="128" cy="190" r="4" fill="#F7EDE0"/></g>
+    <g transform="rotate(10 282 186)"><polygon points="282,152 312,186 282,220 252,186" fill="#8a4ec2"/><text x="282" y="193" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="15" fill="#F7EDE0">8</text></g>
+    <polygon points="150,96 176,140 124,140" fill="#2E1650" stroke="#8BE06F" strokeWidth="1.5" /><text x="150" y="132" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="12" fill="#F7EDE0">4</text>
+    <polygon points="258,86 282,102 273,130 243,130 234,102" fill="#3a1e5c" stroke="#F7EDE0" strokeWidth="1.5" /><text x="258" y="116" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="12" fill="#F7EDE0">12</text>
+    <g transform="rotate(8 316 226)"><polygon points="316,200 338,222 316,252 294,222" fill="#25323A" stroke="#8BE06F" strokeWidth="1.5"/><text x="316" y="230" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="11" fill="#F7EDE0">10</text></g>
+    <g transform="rotate(-8 96 132)"><polygon points="96,110 114,128 96,154 78,128" fill="#8BE06F"/><text x="96" y="136" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="10" fill="#1B0C30">00</text></g>
+    <MiniD20 x={200} y={168} s={1.5} fill={`url(#${id}d)`} stroke="#F7EDE0" num="20" />
+  </g>);
+  if (art === 'miniatura') return base(<g>
+    <ellipse cx="200" cy="248" rx="80" ry="12" fill="#251240" opacity="0.15" />
+    <ellipse cx="200" cy="238" rx="62" ry="14" fill="#25323A" /><ellipse cx="200" cy="232" rx="62" ry="14" fill="#3a4a54" />
+    <g transform="translate(140 60) scale(1.2)">
+      <path d="M50 4 L80 46 L20 46 Z" fill="#5A2596" /><ellipse cx="50" cy="46" rx="36" ry="9" fill="#4A1D78" />
+      <circle cx="50" cy="66" r="21" fill="#F3E3C8" /><ellipse cx="50" cy="68" rx="14" ry="11" fill="#0D0716" />
+      <circle cx="44" cy="66" r="2.4" fill="#7CFF5E" /><circle cx="56" cy="66" r="2.4" fill="#7CFF5E" />
+      <path d="M28 82 Q50 74 72 82 L78 112 Q50 120 22 112 Z" fill="#5A2596" />
+      <path d="M28 82 Q50 74 72 82" stroke="#E8C56A" strokeWidth="3" fill="none" />
+    </g>
+    <path d="M92 92 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z" fill="#E8C56A" /><path d="M310 84 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" fill="#8BE06F" />
+  </g>);
+  if (art === 'livro') return base(<g>
+    <ellipse cx="200" cy="248" rx="92" ry="12" fill="#251240" opacity="0.12" />
+    <path d="M140 84 L252 72 Q262 72 262 82 L262 216 Q262 226 252 226 L140 238 Z" fill="#1B0C30" />
+    <path d="M132 80 L244 68 Q254 68 254 78 L254 212 Q254 222 244 222 L132 234 Z" fill="#2E1650" stroke="#E8C56A" strokeWidth="3" />
+    <rect x="132" y="80" width="14" height="154" fill="#4A1D78" transform="skewY(-6)" />
+    <MiniD20 x={196} y={140} s={1.15} fill="none" stroke="#8BE06F" num="20" />
+    <text x="196" y="196" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="15" fill="#F7EDE0">NIJIAS</text>
+    <path d="M158 206 L232 198" stroke="#E8C56A" strokeWidth="2" opacity="0.7" />
+  </g>);
+  if (art === 'adesivos') return base(<g>
+    <rect x="118" y="64" width="164" height="180" rx="12" fill="#FFFDF8" stroke="#25323A" strokeWidth="2.5" transform="rotate(-4 200 154)" />
+    <g transform="rotate(-4 200 154)">
+      <MiniD20 x={162} y={110} s={0.8} fill="#2E1650" stroke="#8BE06F" num="+1" />
+      <path d="M236 88 l6 15 15 6 -15 6 -6 15 -6 -15 -15 -6 15 -6 Z" fill="#267E1B" />
+      <g fill="#8a4ec2"><circle cx="160" cy="188" r="16" /><circle cx="146" cy="170" r="6" /><circle cx="160" cy="164" r="6" /><circle cx="174" cy="170" r="6" /></g>
+      <text x="238" y="200" textAnchor="middle" fontFamily="Montserrat, sans-serif" fontWeight="900" fontSize="26" fill="#267E1B">+1</text>
+    </g>
+    <path d="M310 96 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" fill="#E8C56A" />
+  </g>);
+  return base(<g>
+    <circle cx="200" cy="150" r="96" fill="#8a4ec2" opacity="0.12" /><ellipse cx="200" cy="242" rx="88" ry="13" fill="#251240" opacity="0.18" />
+    <MiniD20 x={200} y={150} s={2.7} fill={`url(#${id}d)`} stroke="#E8C56A" num="20" />
+    <path d="M92 92 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z" fill="#E8C56A" /><path d="M310 76 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" fill="#8BE06F" /><path d="M318 208 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" fill="#E8C56A" opacity="0.8" />
+  </g>);
+}
+
+/* ---------- Dados-semente ---------- */
+const seedStats = { mesas: 1247, mesas_abertas: 386, jogadores: 9832, mestres: 1214 };
+const seedThemes = [
+  { slug: 'fantasia-medieval-classica', name: 'Fantasia Medieval / Clássica', count: 214, desc: 'Dragões, guildas e masmorras — o RPG clássico de espada e magia.' },
+  { slug: 'cyberpunk-futurista', name: 'Cyberpunk / Futurista', count: 156, desc: 'Implantes, megacorporações e ruas de neon.' },
+  { slug: 'terror-sobrenatural', name: 'Terror / Sobrenatural', count: 132, desc: 'Mistério, tensão e coisas que não deveriam existir.' },
+  { slug: 'pos-apocalipse', name: 'Pós-Apocalipse', count: 98, desc: 'Sobrevivência em mundos depois do fim.' },
+  { slug: 'space-opera-sci-fi-espacial', name: 'Space Opera / Sci-Fi Espacial', count: 121, desc: 'Naves, facções e fronteiras galácticas.' },
+  { slug: 'investigacao-policial-noir', name: 'Investigação / Policial / Noir', count: 87, desc: 'Pistas, interrogatórios e casos para resolver.' },
+];
+const seedTables = [
+  { id: 'coroa-partida', title: 'A Coroa Partida de Eldoria', system: 'D&D 5e', master: 'Rafael Duarte', format: 'online', location: null, slots: 2, schedule: 'Sáb · 19h–22h', tags: ['Iniciantes', 'Semanal', 'Narrativa'], theme: 'fantasia-medieval-classica' },
+  { id: 'neon-setor-7', title: 'Neon Vermelho: Setor 7', system: 'Cyberpunk RED', master: 'Ana Kuroda', format: 'presencial', location: 'São Paulo · SP', slots: 3, schedule: 'Qui · 20h–23h', tags: ['16+', 'Presencial', 'Ação'], theme: 'cyberpunk-futurista' },
+  { id: 'sussurros-blackwater', title: 'Sussurros em Blackwater', system: 'Call of Cthulhu', master: 'Diego Ferraz', format: 'online', location: null, slots: 1, schedule: 'Dom · 16h–19h', tags: ['18+', 'Investigação', 'Terror'], theme: 'terror-sobrenatural' },
+  { id: 'estrelas-de-kessler', title: 'As Estrelas de Kessler', system: 'Starfinder', master: 'Luiza Antunes', format: 'online', location: null, slots: 4, schedule: 'Sex · 20h–23h', tags: ['Iniciantes', 'Exploração', 'Semanal'], theme: 'space-opera-sci-fi-espacial' },
+  { id: 'estrada-cinzenta', title: 'Estrada Cinzenta', system: 'Apocalypse World', master: 'Caio Mendes', format: 'presencial', location: 'Curitiba · PR', slots: 2, schedule: 'Sáb · 14h–18h', tags: ['16+', 'Sobrevivência', 'Drama'], theme: 'pos-apocalipse' },
+  { id: 'caso-44', title: 'O Caso 44 da Rua Aurora', system: 'GUMSHOE', master: 'Helena Prado', format: 'online', location: null, slots: 3, schedule: 'Qua · 19h–22h', tags: ['Noir', 'Investigação', 'Quinzenal'], theme: 'investigacao-policial-noir' },
+];
+const seedProducts = [
+  { id: 'moletom', name: 'Moletom +1 RPG', price_cents: 16990, cat: 'vestuario', art: 'moletom', official: '/products/produto-moletom.png' },
+  { id: 'camiseta', name: 'Camiseta +1 RPG', price_cents: 7990, cat: 'vestuario', art: 'camiseta', official: '/products/produto-camiseta.png' },
+  { id: 'dados-7', name: 'Conjunto 7 dados', price_cents: 5990, cat: 'dados', art: 'dados-7', official: '/products/produto-dados-oficiais.png' },
+  { id: 'dados-premium', name: 'Dados premium', price_cents: 11990, cat: 'dados', art: 'dados-premium', official: '/products/produto-saco-dados.png' },
+  { id: 'miniatura-simples', name: 'Miniatura simples', price_cents: 7990, cat: 'miniaturas', art: 'miniatura', official: '/products/miniatura-critin.png' },
+  { id: 'miniatura-personalizada', name: 'Miniatura personalizada', price_cents: 14990, plus: true, cat: 'miniaturas', art: 'miniatura', official: '/products/miniatura-critin.png' },
+  { id: 'livro-aventura', name: 'Livro de aventura', price_cents: 8990, plus: true, cat: 'livros', art: 'livro', official: '/products/nijias-basico.png' },
+  { id: 'kit-adesivos', name: 'Kit adesivos', price_cents: 3490, cat: 'acessorios', art: 'adesivos', official: null },
+];
+const seedPlans = [
+  { slug: 'aventureiro', name: 'Aventureiro', price: 'R$ 0', desc: 'Participar e publicar mesas é grátis para sempre.', features: ['Participar de mesas', 'Publicar e divulgar mesas', 'Perfil básico', 'Buscar e salvar favoritas'] },
+  { slug: 'avancado', name: 'Avançado', price: 'R$ 39,90', featured: true, desc: 'Ferramentas para jogar com mais estilo.', features: ['Fichas digitais personalizadas', 'Tabletop oficial +1 RPG', 'Tokens digitais', 'Efeitos sonoros'] },
+  { slug: 'mestre', name: 'Mestre', price: 'R$ 79,90', desc: 'Para Mestres que levam a mesa a sério.', features: ['Artes exclusivas de artistas parceiros', 'Efeitos sonoros próprios', 'Miniaturas exclusivas do Critin', 'Kits físicos de dados'] },
+  { slug: 'lendario', name: 'Lendário', price: 'R$ 149,90', desc: 'A experiência completa, do digital ao físico.', features: ['Cursos de narratologia, oratória e mestragem', 'Caixa surpresa bimestral: dados, aventura de Nijias e miniaturas', 'Suplementos patrocinados'] },
+];
+const seedTestimonials = [
+  { name: 'Mariana R.', detail: 'Mestra há 2 anos · D&D 5e', quote: 'Preenchi a ficha da minha campanha numa noite e no fim de semana já tinha grupo fechado. Nunca foi tão fácil achar jogadores compatíveis.' },
+  { name: 'Lucas P.', detail: 'Jogador iniciante', quote: "Nunca joguei RPG na vida. Filtrei 'para iniciantes', achei uma mesa online acolhedora e hoje sou viciado. O Critin tinha razão!" },
+  { name: 'Carla M.', detail: 'Mestra · Tormenta20', quote: 'Aprovar solicitações direto do painel acabou com o caos do grupo de WhatsApp. Vagas, horários e faltas organizados num lugar só.' },
+  { name: 'Diego F.', detail: 'Jogador · Ordem Paranormal', quote: 'Os filtros salvaram minhas tardes: encontrei mesa presencial perto de casa, com faixa etária e nível certos. E a loja tem dados lindos.' },
+  { name: 'Bia S.', detail: 'Jogadora · primeira campanha', quote: 'Tinha medo de julgamento. A declaração de convivência do Mestre me deu confiança para entrar — e a mesa virou minha semana.' },
+  { name: 'Rafael T.', detail: 'Mestre · Call of Cthulhu', quote: 'Minha mesa 18+ só aparece para perfis compatíveis. Menos ruído, mais horror investigativo de qualidade. Recomendo para todo Mestre.' },
+];
+const cosmeticPools = {
+  comum: [{ name: 'Moldura Recruta da Guilda', type: 'Moldura' }, { name: 'Cor Pergaminho', type: 'Cor de perfil' }, { name: 'Banner Taverna', type: 'Banner' }],
+  incomum: [{ name: 'Moldura Folha Élfica', type: 'Moldura' }, { name: 'Cor Verde-Bruxa', type: 'Cor de perfil' }, { name: 'Banner Névoa Verde', type: 'Banner' }],
+  raro: [{ name: 'Moldura Arcana Violeta', type: 'Moldura' }, { name: 'Banner Névoa Arcana', type: 'Banner' }, { name: 'Cor Magia Antiga', type: 'Cor de perfil' }],
+  epico: [{ name: 'Moldura Olhos de Critin', type: 'Moldura' }, { name: 'Banner Aurora Dourada', type: 'Banner' }, { name: 'Cor Ouro do Crítico', type: 'Cor de perfil' }],
+  lendario: [{ name: 'Banner Aurora do d20', type: 'Banner' }, { name: 'Moldura Lendária do Critin', type: 'Moldura' }, { name: 'Cor Crítico Perfeito', type: 'Cor de perfil' }],
+};
+function tierFor(v) { if (v >= 20) return { key: 'lendario', label: 'Lendário' }; if (v >= 16) return { key: 'epico', label: 'Épico' }; if (v >= 11) return { key: 'raro', label: 'Raro' }; if (v >= 6) return { key: 'incomum', label: 'Incomum' }; return { key: 'comum', label: 'Comum' }; }
+function localCosmetic(v) { const t = tierFor(v); const p = cosmeticPools[t.key]; return { ...p[v % p.length], rarity: t.label }; }
+const RARITY_RING = { Comum: '#F7EDE0', Incomum: '#8BE06F', Raro: '#c9a2ec', 'Épico': '#E8C56A', 'Lendário': '#a8ed96' };
+const FREE_SHIP = 19900;
+
+/* ---------- Estado global ---------- */
+const AppContext = React.createContext(null);
+const SESSION_KEY = 'mais1rpg:session';
+function AppProvider({ children }) {
+  const [user, setUser] = React.useState(() => readJSON(SESSION_KEY, null));
+  const [cart, setCart] = React.useState(() => readJSON('mais1rpg:cart', []));
+  const [cartOpen, setCartOpen] = React.useState(false);
+  const [toasts, setToasts] = React.useState([]);
+  const [auth, setAuth] = React.useState({ open: false, mode: 'signup', plan: null, context: null });
+  const [publishOpen, setPublishOpen] = React.useState(false);
+  const [nijiasOpen, setNijiasOpen] = React.useState(false);
+  const [storeExpanded, setStoreExpanded] = React.useState(false);
+  const [userTables, setUserTables] = React.useState(() => readJSON('mais1rpg:tables', []));
+  const [interests, setInterests] = React.useState(() => readJSON('mais1rpg:interests', []));
+  const [themeFilter, setThemeFilter] = React.useState(null);
+  const [assetsReady, setAssetsReady] = React.useState(false);
+  const timers = React.useRef([]);
+  React.useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  // Sonda única: se o pacote oficial existir em /public, usamos as fotos; senão, SVG autoral.
+  React.useEffect(() => {
+    const img = new Image();
+    img.onload = () => setAssetsReady(true);
+    img.src = '/logo-plus1rpg.png';
+  }, []);
+  const pushToast = React.useCallback((message, action) => {
+    const id = Date.now() + Math.random();
+    setToasts((t) => [...t.slice(-2), { id, message, action }]);
+    timers.current.push(setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), action ? 6500 : 4200));
+  }, []);
+  const openAuth = React.useCallback((mode = 'signup', plan = null, context = null) => setAuth({ open: true, mode, plan, context }), []);
+  const closeAuth = React.useCallback(() => setAuth((a) => ({ ...a, open: false })), []);
+  const persistUser = (u) => { setUser(u); if (u) localStorage.setItem(SESSION_KEY, JSON.stringify(u)); else localStorage.removeItem(SESSION_KEY); };
+  const persistCart = (c) => { setCart(c); localStorage.setItem('mais1rpg:cart', JSON.stringify(c)); };
+  const completeAuth = React.useCallback(async ({ name, email, password, mode }) => {
+    const plan = auth.plan, ctx = auth.context; let session = null;
+    try {
+      const r = await apiPost(mode === 'login' ? '/api/auth/login' : '/api/auth/register', { name, email, password });
+      if (r && (r.user || r.name)) session = { id: String(r.user?.id || r.id || email), name: r.user?.name || r.name || name, email, plan: r.user?.plan || 'aventureiro' };
+    } catch (e) { /* backend ausente: sessão local */ }
+    if (!session) session = { id: 'local-' + email.toLowerCase(), name: name || email.split('@')[0], email, plan: 'aventureiro' };
+    if (plan) session.plan = plan.slug;
+    persistUser(session); closeAuth();
+    pushToast('Bem-vindo à mesa, ' + session.name + '! Sua aventura começa agora.');
+    if (plan) pushToast('Plano ' + plan.name + ' ativado na sua conta!');
+    if (ctx === 'mestre') setTimeout(() => setPublishOpen(true), 350);
+  }, [auth.plan, auth.context, closeAuth, pushToast]);
+  const logout = React.useCallback(() => { persistUser(null); pushToast('Você saiu da conta. Até a próxima aventura!'); }, [pushToast]);
+  const activatePlan = React.useCallback((plan) => {
+    if (!user) { openAuth('signup', plan); return; }
+    persistUser({ ...user, plan: plan.slug });
+    pushToast('Plano ' + plan.name + ' ativado na sua conta!');
+  }, [user, openAuth, pushToast]);
+  const equipCosmetic = React.useCallback((c) => {
+    if (!user) return;
+    persistUser({ ...user, cosmetic: c });
+    pushToast(c.name + ' equipado no seu perfil!');
+  }, [user, pushToast]);
+  const addToCart = React.useCallback((p) => {
+    setCart((c) => {
+      const hit = c.find((x) => x.id === p.id);
+      const next = hit ? c.map((x) => x.id === p.id ? { ...x, qty: Math.min(9, x.qty + 1) } : x)
+        : [...c, { id: p.id, name: p.name, price_cents: p.price_cents, art: p.art, official: p.official || null, qty: 1 }];
+      localStorage.setItem('mais1rpg:cart', JSON.stringify(next));
+      return next;
+    });
+    pushToast(p.name + ' adicionado ao carrinho.', { label: 'Ver carrinho', onClick: () => setCartOpen(true) });
+  }, [pushToast]);
+  const setQty = React.useCallback((id, qty) => {
+    setCart((c) => { const next = c.map((x) => x.id === id ? { ...x, qty: Math.max(1, Math.min(9, qty)) } : x); localStorage.setItem('mais1rpg:cart', JSON.stringify(next)); return next; });
+  }, []);
+  const removeFromCart = React.useCallback((id) => {
+    setCart((c) => {
+      const removed = c.find((x) => x.id === id);
+      const next = c.filter((x) => x.id !== id);
+      localStorage.setItem('mais1rpg:cart', JSON.stringify(next));
+      if (removed) pushToast(removed.name + ' removido do carrinho.', { label: 'Desfazer', onClick: () => setCart((cur) => { const back = [...cur, removed]; localStorage.setItem('mais1rpg:cart', JSON.stringify(back)); return back; }) });
+      return next;
+    });
+  }, [pushToast]);
+  const clearCart = React.useCallback(() => persistCart([]), []);
+  const cartCount = cart.reduce((s, x) => s + x.qty, 0);
+  const cartSubtotal = cart.reduce((s, x) => s + x.qty * x.price_cents, 0);
+  const addTable = React.useCallback((t) => {
+    setUserTables((list) => { const next = [t, ...list]; localStorage.setItem('mais1rpg:tables', JSON.stringify(next)); return next; });
+    pushToast('Mesa publicada! O Critin já está divulgando para a comunidade.');
+    setTimeout(() => scrollToId('mesas'), 250);
+  }, [pushToast]);
+  const removeTable = React.useCallback((id) => {
+    setUserTables((list) => {
+      const removed = list.find((t) => t.id === id);
+      const next = list.filter((t) => t.id !== id);
+      localStorage.setItem('mais1rpg:tables', JSON.stringify(next));
+      if (removed) pushToast('Mesa "' + removed.title + '" encerrada.', { label: 'Desfazer', onClick: () => setUserTables((cur) => { const back = [removed, ...cur]; localStorage.setItem('mais1rpg:tables', JSON.stringify(back)); return back; }) });
+      return next;
+    });
+  }, [pushToast]);
+  const toggleInterest = React.useCallback((id, title) => {
+    if (!user) { openAuth('signup'); return false; }
+    setInterests((list) => {
+      const has = list.includes(id);
+      const next = has ? list.filter((x) => x !== id) : [...list, id];
+      localStorage.setItem('mais1rpg:interests', JSON.stringify(next));
+      pushToast(has ? 'Interesse removido de "' + title + '".' : 'Interesse enviado! O Mestre de "' + title + '" foi avisado.');
+      return next;
+    });
+    return true;
+  }, [user, openAuth, pushToast]);
+  const openPublish = React.useCallback(() => { if (!user) openAuth('signup', null, 'mestre'); else setPublishOpen(true); }, [user, openAuth]);
+  return (
+    <AppContext.Provider value={{ user, completeAuth, logout, cart, cartOpen, setCartOpen, addToCart, setQty, removeFromCart, clearCart, cartCount, cartSubtotal, toasts, pushToast, auth, openAuth, closeAuth, activatePlan, equipCosmetic, publishOpen, setPublishOpen, openPublish, nijiasOpen, setNijiasOpen, storeExpanded, setStoreExpanded, userTables, addTable, removeTable, interests, toggleInterest, themeFilter, setThemeFilter, assetsReady }}>
+      {children}
+    </AppContext.Provider>
+  );
+}
+const useApp = () => React.useContext(AppContext);
+
+/* ---------- Critin com fotos oficiais quando disponíveis ---------- */
+function CritinArt({ pose = 'hero', mood = 'feliz', dice = true, className = '', label, eager = false }) {
+  const { assetsReady } = useApp();
+  const src = pose === 'celebrate' ? '/critin/comemorando.png' : (mood !== 'feliz' || !dice) ? '/estados/' + mood + '.png' : '/critin/hero.png';
+  const [failed, setFailed] = React.useState(false);
+  if (assetsReady && !failed) {
+    return <img src={src} alt={label || 'Critin, mascote da +1 RPG'} className={className} loading={eager ? 'eager' : 'lazy'} draggable={false} onError={() => setFailed(true)} />;
+  }
+  return <CritinSVG pose={pose} mood={mood} dice={dice} className={className} label={label} />;
+}
+function ThemeArt({ slug, uid = slug, className = '', label }) {
+  const { assetsReady } = useApp();
+  const [failed, setFailed] = React.useState(false);
+  if (assetsReady && !failed) {
+    return <img src={'/themes/' + slug + '.jpeg'} alt={label || 'Cena do tema com o Critin'} className={'object-cover ' + className} loading="lazy" draggable={false} onError={() => setFailed(true)} />;
+  }
+  return <ThemeArtSvg slug={slug} uid={uid} className={className} label={label} />;
+}
+function ProductArt({ art, official, uid, label }) {
+  const { assetsReady } = useApp();
+  const [failed, setFailed] = React.useState(false);
+  if (assetsReady && official && !failed) {
+    return <img src={official} alt={label} className="h-full w-full object-cover" loading="lazy" draggable={false} onError={() => setFailed(true)} />;
+  }
+  return <ProductArtSvg art={art} uid={uid} label={label} />;
+}
+
+/* ---------- Reveal / Toasts / foco ---------- */
+function Reveal({ children, delay = 0, y = 24, className = '' }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div className={className} initial={reduce ? false : { opacity: 0, y }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}>
+      {children}
+    </motion.div>
+  );
+}
+function Toasts() {
+  const { toasts } = useApp();
+  return (
+    <div aria-live="polite" className="pointer-events-none fixed bottom-5 inset-x-4 z-[95] flex flex-col items-end gap-2 sm:inset-x-auto sm:right-5">
+      <AnimatePresence>
+        {toasts.map((t) => (
+          <motion.div key={t.id} data-testid="toast-item" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-2xl border border-verde/30 bg-violeta-deep/95 px-4 py-3 shadow-card backdrop-blur-xl">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-verde/25 text-verde-light"><Icon name="check" size={15} /></span>
+            <p className="text-sm leading-snug text-creme">{t.message}</p>
+            {t.action && (
+              <button type="button" data-testid="toast-action" onClick={t.action.onClick}
+                className="shrink-0 rounded-full border border-verde-light/50 px-3 py-1 text-xs font-bold text-verde-light transition-colors duration-300 hover:bg-verde/20">
+                {t.action.label}
+              </button>
+            )}
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+function useFocusTrap(active, ref, onClose) {
+  React.useEffect(() => {
+    if (!active) return;
+    const prev = document.activeElement;
+    const sel = 'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])';
+    const t = setTimeout(() => { const n = ref.current; if (!n) return; const f = n.querySelector(sel); f && f.focus(); }, 60);
+    const onKey = (e) => {
+      if (e.key === 'Escape') { onClose && onClose(); return; }
+      if (e.key !== 'Tab' || !ref.current) return;
+      const items = [...ref.current.querySelectorAll(sel)].filter((el) => el.getClientRects().length);
+      if (!items.length) return;
+      const i = items.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (!e.shiftKey && i === items.length - 1) { e.preventDefault(); items[0].focus(); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => { clearTimeout(t); document.removeEventListener('keydown', onKey); if (prev && prev.focus) prev.focus(); };
+  }, [active]);
+}
+function ModalShell({ open, onClose, labelledBy, children, wide }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => { if (!open) return; lockScroll(); return () => unlockScroll(); }, [open]);
+  useFocusTrap(open, ref, onClose);
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div key="scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-violeta-darker/80 p-4 backdrop-blur-sm" onClick={onClose}>
+          <motion.div ref={ref} role="dialog" aria-modal="true" aria-labelledby={labelledBy}
+            initial={{ opacity: 0, scale: 0.96, y: 14 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 14 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className={'relative max-h-[88vh] w-full overflow-y-auto rounded-3xl border border-creme/15 bg-violeta-deep p-8 shadow-card ' + (wide ? 'max-w-2xl' : 'max-w-md')}
+            onClick={(e) => e.stopPropagation()}>
+            <button type="button" onClick={onClose} data-testid="modal-close" aria-label="Fechar"
+              className="absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-creme/15 bg-violeta-deep text-creme/60 transition-colors duration-300 hover:border-verde-light hover:text-verde-light">
+              <Icon name="x" size={16} />
+            </button>
+            {children}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ---------- Modal de conta ---------- */
+function AuthModal() {
+  const { auth, closeAuth, completeAuth } = useApp();
+  const { open, mode: initialMode, plan, context } = auth;
+  const [mode, setMode] = React.useState(initialMode);
+  const [name, setName] = React.useState(''); const [email, setEmail] = React.useState(''); const [password, setPassword] = React.useState('');
+  const [showPass, setShowPass] = React.useState(false);
+  const [busy, setBusy] = React.useState(false);
+  React.useEffect(() => { if (open) { setMode(initialMode); setBusy(false); setShowPass(false); } }, [open, initialMode]);
+  const title = plan ? 'Assinar ' + plan.name : mode === 'signup' ? 'Crie sua conta grátis' : 'Bem-vindo de volta';
+  const subtitle = plan ? 'Crie sua conta para continuar com o plano escolhido.' : context === 'mestre' ? 'Publique sua mesa e encontre os jogadores certos.' : mode === 'signup' ? 'O Critin já separou os dados. Só falta você.' : 'Sua mesa está com saudades. Entre para continuar.';
+  const onSubmit = async (e) => {
+    e.preventDefault(); if (busy) return; setBusy(true);
+    await new Promise((r) => setTimeout(r, 450));
+    await completeAuth({ name: name.trim(), email: email.trim(), password, mode });
+    setName(''); setEmail(''); setPassword(''); setBusy(false);
+  };
+  const tab = (m, label, testid) => (
+    <button type="button" onClick={() => setMode(m)} data-testid={testid} aria-pressed={mode === m}
+      className={'flex-1 rounded-full px-4 py-2 font-heading text-sm font-bold transition-colors duration-300 ' + (mode === m ? 'bg-verde text-creme' : 'text-creme/60 hover:text-creme')}>
+      {label}
+    </button>
+  );
+  return (
+    <ModalShell open={open} onClose={closeAuth} labelledBy="auth-title">
+      <LogoMark size={44} />
+      <h2 id="auth-title" className="mt-4 font-heading text-2xl font-black tracking-tight text-creme">{title}</h2>
+      <p className="mt-2 text-sm leading-relaxed text-creme/65">{subtitle}</p>
+      {!plan && (
+        <div className="mt-5 flex gap-1 rounded-full border border-creme/10 bg-violeta-mid/40 p-1">
+          {tab('login', 'Entrar', 'auth-tab-login')}
+          {tab('signup', 'Criar conta', 'auth-tab-signup')}
+        </div>
+      )}
+      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+        {mode === 'signup' && (
+          <div>
+            <label htmlFor="auth-name" className="mb-1.5 block text-sm font-semibold text-creme/80">Nome de aventureiro</label>
+            <input id="auth-name" data-testid="auth-input-name" type="text" required maxLength={40} value={name} onChange={(e) => setName(e.target.value)} placeholder="Como o Critin deve te chamar?" className="input" />
+          </div>
+        )}
+        <div>
+          <label htmlFor="auth-email" className="mb-1.5 block text-sm font-semibold text-creme/80">E-mail</label>
+          <input id="auth-email" data-testid="auth-input-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@exemplo.com" className="input" />
+        </div>
+        <div>
+          <label htmlFor="auth-password" className="mb-1.5 block text-sm font-semibold text-creme/80">Senha</label>
+          <div className="relative">
+            <input id="auth-password" data-testid="auth-input-password" type={showPass ? 'text' : 'password'} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo de 6 caracteres" className="input pr-12" />
+            <button type="button" onClick={() => setShowPass((s) => !s)} data-testid="auth-toggle-password" aria-label={showPass ? 'Ocultar senha' : 'Mostrar senha'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-creme/50 transition-colors duration-300 hover:text-verde-light">
+              <Icon name={showPass ? 'eye-off' : 'eye'} size={18} />
+            </button>
+          </div>
+        </div>
+        <button type="submit" disabled={busy} data-testid="auth-submit" className="btn-primary w-full disabled:opacity-70">
+          {busy && <Icon name="loader" size={18} className="animate-spin" />}
+          {busy ? 'Preparando a mesa...' : plan ? 'Continuar com o plano' : mode === 'signup' ? 'Criar conta' : 'Entrar'}
+        </button>
+      </form>
+      <p className="mt-5 text-center text-xs leading-relaxed text-creme/45">Ao continuar, você concorda com os Termos de Uso e as Diretrizes da comunidade.</p>
+    </ModalShell>
+  );
+}
+
+/* ---------- Modal: publicar mesa com pré-visualização ao vivo ---------- */
+function PublishModal() {
+  const { publishOpen, setPublishOpen, user, addTable } = useApp();
+  const [form, setForm] = React.useState({ title: '', system: 'D&D 5e', theme: 'fantasia-medieval-classica', format: 'online', location: '', slots: 3, schedule: '', level: 'Iniciantes' });
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const close = React.useCallback(() => setPublishOpen(false), [setPublishOpen]);
+  const bump = (d) => setForm((f) => ({ ...f, slots: Math.max(1, Math.min(8, Number(f.slots) + d)) }));
+  const onSubmit = (e) => {
+    e.preventDefault();
+    addTable({
+      id: 'user-' + Date.now(), title: form.title.trim(), system: form.system, master: user ? user.name : 'Você',
+      format: form.format, location: form.format === 'presencial' ? (form.location.trim() || 'A combinar') : null,
+      slots: Math.max(1, Math.min(8, Number(form.slots) || 1)), schedule: form.schedule.trim() || 'A combinar',
+      tags: [form.level, form.format === 'online' ? 'Online' : 'Presencial', 'Nova'], theme: form.theme, mine: true,
+    });
+    close();
+  };
+  return (
+    <ModalShell open={publishOpen} onClose={close} labelledBy="publish-title" wide>
+      <div className="flex items-center gap-4">
+        <CritinArt mood="feliz" dice={false} className="w-16 shrink-0" label="Critin feliz pronto para divulgar sua mesa" />
+        <div>
+          <h2 id="publish-title" className="font-heading text-2xl font-black tracking-tight text-creme">Publicar minha mesa</h2>
+          <p className="mt-1 text-sm text-creme/65">Apresente sua campanha — ela aparece na vitrine da home na hora.</p>
+        </div>
+      </div>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label htmlFor="pub-title" className="mb-1.5 block text-sm font-semibold text-creme/80">Título da campanha</label>
+            <input id="pub-title" data-testid="publish-input-title" required maxLength={60} value={form.title} onChange={set('title')} placeholder="Ex.: A Torre do Último Farol" className="input" />
+          </div>
+          <div>
+            <label htmlFor="pub-system" className="mb-1.5 block text-sm font-semibold text-creme/80">Sistema</label>
+            <select id="pub-system" data-testid="publish-select-system" value={form.system} onChange={set('system')} className="input">
+              {['D&D 5e', 'Tormenta20', 'Call of Cthulhu', 'Cyberpunk RED', 'Ordem Paranormal', 'Starfinder', 'Apocalypse World', 'GUMSHOE', 'Sistema próprio'].map((s) => <option key={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="pub-theme" className="mb-1.5 block text-sm font-semibold text-creme/80">Tema</label>
+            <select id="pub-theme" data-testid="publish-select-theme" value={form.theme} onChange={set('theme')} className="input">
+              {seedThemes.map((t) => <option key={t.slug} value={t.slug}>{t.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="pub-format" className="mb-1.5 block text-sm font-semibold text-creme/80">Formato</label>
+            <select id="pub-format" data-testid="publish-select-format" value={form.format} onChange={set('format')} className="input">
+              <option value="online">Online</option><option value="presencial">Presencial</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="pub-level" className="mb-1.5 block text-sm font-semibold text-creme/80">Nível da mesa</label>
+            <select id="pub-level" data-testid="publish-select-level" value={form.level} onChange={set('level')} className="input">
+              {['Iniciantes', 'Intermediário', 'Veteranos', '16+', '18+'].map((s) => <option key={s}>{s}</option>)}
+            </select>
+          </div>
+          {form.format === 'presencial' && (
+            <div className="sm:col-span-2">
+              <label htmlFor="pub-location" className="mb-1.5 block text-sm font-semibold text-creme/80">Cidade · UF</label>
+              <input id="pub-location" data-testid="publish-input-location" value={form.location} onChange={set('location')} placeholder="Ex.: Belo Horizonte · MG" className="input" />
+            </div>
+          )}
+          <div>
+            <span className="mb-1.5 block text-sm font-semibold text-creme/80">Vagas</span>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => bump(-1)} data-testid="publish-slots-minus" aria-label="Menos vagas" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-creme/15 text-creme/70 transition-colors duration-300 hover:border-verde-light hover:text-verde-light"><Icon name="minus" size={16} /></button>
+              <input id="pub-slots" data-testid="publish-input-slots" type="number" min="1" max="8" required value={form.slots} onChange={set('slots')} className="input tnum text-center" aria-label="Vagas" />
+              <button type="button" onClick={() => bump(1)} data-testid="publish-slots-plus" aria-label="Mais vagas" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-creme/15 text-creme/70 transition-colors duration-300 hover:border-verde-light hover:text-verde-light"><Icon name="plus" size={16} /></button>
+            </div>
+          </div>
+          <div>
+            <label htmlFor="pub-schedule" className="mb-1.5 block text-sm font-semibold text-creme/80">Horário</label>
+            <input id="pub-schedule" data-testid="publish-input-schedule" value={form.schedule} onChange={set('schedule')} placeholder="Ex.: Sex · 19h–22h" className="input" />
+          </div>
+          <button type="submit" data-testid="publish-submit" className="btn-primary sm:col-span-2"><Icon name="swords" size={18} /> Publicar mesa</button>
+        </form>
+        {/* Pré-visualização ao vivo */}
+        <div className="hidden lg:block">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-verde-soft">Pré-visualização</p>
+          <div className="card-surface overflow-hidden rounded-2xl">
+            <div className="h-28 overflow-hidden"><ThemeArt slug={form.theme} uid="pub-preview" className="h-full w-full" label="Pré-visualização da arte do tema" /></div>
+            <div className="p-4">
+              <div className="flex flex-wrap gap-1.5">
+                <span className="chip border-verde/40 text-verde-light">{form.system}</span>
+                <span className="chip">{form.format === 'online' ? 'Online' : 'Presencial'}</span>
+              </div>
+              <p className="mt-2.5 font-heading font-bold leading-snug text-creme">{form.title.trim() || 'Sua campanha'}</p>
+              <p className="mt-1 text-xs text-creme/60">Mestrada por {user ? user.name : 'você'}</p>
+              <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-verde-light"><Icon name="users" size={13} /> {form.slots} {Number(form.slots) === 1 ? 'vaga' : 'vagas'} · {form.schedule.trim() || 'A combinar'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
+
+/* ---------- Gaveta do carrinho (checkout completo) ---------- */
+function CartDrawer() {
+  const { cart, cartOpen, setCartOpen, setQty, removeFromCart, clearCart, cartSubtotal, cartCount, pushToast } = useApp();
+  const [stage, setStage] = React.useState('cart');
+  const [order, setOrder] = React.useState(null);
+  const ref = React.useRef(null);
+  const close = React.useCallback(() => setCartOpen(false), [setCartOpen]);
+  React.useEffect(() => { if (!cartOpen) return; lockScroll(); return () => unlockScroll(); }, [cartOpen]);
+  React.useEffect(() => { if (cartOpen) setStage('cart'); }, [cartOpen]);
+  useFocusTrap(cartOpen, ref, close);
+  const checkout = () => {
+    setStage('processing');
+    const summary = { code: 'MP1-' + String(Math.floor(10000 + Math.random() * 90000)), total: cartSubtotal, items: cartCount };
+    setTimeout(() => { setOrder(summary); clearCart(); setStage('done'); }, 900);
+  };
+  const shipPct = Math.min(100, Math.round((cartSubtotal / FREE_SHIP) * 100));
+  return (
+    <AnimatePresence>
+      {cartOpen && (
+        <motion.div key="cart-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-[85] bg-violeta-darker/80 backdrop-blur-sm" onClick={close}>
+          <motion.aside ref={ref} role="dialog" aria-modal="true" aria-label="Seu carrinho"
+            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-creme/10 bg-violeta-deep"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-creme/10 px-6 py-5">
+              <h2 className="flex items-center gap-2.5 font-heading text-xl font-black text-creme"><Icon name="shopping-cart" size={20} className="text-verde-light" /> Seu carrinho {cartCount > 0 && <span className="tnum rounded-full bg-verde/20 px-2.5 py-0.5 text-sm font-bold text-verde-light">{cartCount}</span>}</h2>
+              <button type="button" onClick={close} data-testid="cart-close" aria-label="Fechar carrinho" className="flex h-9 w-9 items-center justify-center rounded-full border border-creme/15 text-creme/60 transition-colors duration-300 hover:border-verde-light hover:text-verde-light"><Icon name="x" size={16} /></button>
+            </div>
+
+            {stage === 'done' && order ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
+                <CritinArt pose="celebrate" className="w-40" label="Critin comemorando seu pedido" />
+                <h3 className="font-heading text-2xl font-black text-creme">Pedido registrado!</h3>
+                <p className="text-sm leading-relaxed text-creme/70">Pedido <span className="tnum font-bold text-verde-light">{order.code}</span> · {order.items} {order.items === 1 ? 'item' : 'itens'} · {formatBRL(order.total)}. Você receberá os detalhes de pagamento e envio por e-mail.</p>
+                <button type="button" onClick={close} data-testid="cart-continue" className="btn-primary mt-2">Continuar explorando</button>
+              </div>
+            ) : cart.length === 0 ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
+                <CritinArt mood="curioso" dice={false} className="w-32" label="Critin curioso olhando o carrinho vazio" />
+                <h3 className="font-heading text-xl font-bold text-creme">Seu carrinho está vazio</h3>
+                <p className="text-sm leading-relaxed text-creme/65">Dados, miniaturas e o moletom oficial estão esperando por você na loja.</p>
+                <button type="button" data-testid="cart-go-store" onClick={() => { close(); setTimeout(() => scrollToId('loja'), 200); }} className="btn-primary mt-2">Explorar a loja</button>
+              </div>
+            ) : (
+              <React.Fragment>
+                <div className="flex-1 overflow-y-auto px-6 py-5">
+                  {/* Frete grátis */}
+                  <div className="mb-5 rounded-2xl border border-creme/10 bg-violeta-mid/40 p-4">
+                    <p className="flex items-center gap-2 text-sm font-semibold text-creme">
+                      <Icon name="package" size={16} className="text-verde-light" />
+                      {cartSubtotal >= FREE_SHIP ? 'Frete grátis desbloqueado!' : 'Faltam ' + formatBRL(FREE_SHIP - cartSubtotal) + ' para frete grátis'}
+                    </p>
+                    <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-creme/10">
+                      <div className="h-full rounded-full bg-gradient-to-r from-verde to-verde-light" style={{ width: shipPct + '%', transition: 'width .5s cubic-bezier(.22,1,.36,1)' }} />
+                    </div>
+                  </div>
+                  <ul className="space-y-4">
+                    {cart.map((item) => (
+                      <li key={item.id} className="flex gap-4 rounded-2xl border border-creme/10 p-3" data-testid={'cart-item-' + item.id}>
+                        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-creme">
+                          <ProductArt art={item.art} official={item.official} uid={'cart-' + item.id} label={item.name} />
+                        </div>
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-heading text-sm font-bold leading-snug text-creme">{item.name}</p>
+                            <button type="button" onClick={() => removeFromCart(item.id)} data-testid={'cart-remove-' + item.id} aria-label={'Remover ' + item.name}
+                              className="shrink-0 text-creme/40 transition-colors duration-300 hover:text-ouro"><Icon name="trash" size={15} /></button>
+                          </div>
+                          <p className="tnum mt-0.5 text-xs text-creme/55">{formatBRL(item.price_cents)} / un.</p>
+                          <div className="mt-auto flex items-center justify-between pt-2">
+                            <div className="flex items-center gap-1 rounded-full border border-creme/15">
+                              <button type="button" onClick={() => setQty(item.id, item.qty - 1)} disabled={item.qty <= 1} data-testid={'cart-minus-' + item.id} aria-label="Diminuir quantidade" className="flex h-7 w-7 items-center justify-center rounded-full text-creme/70 transition-colors duration-300 hover:text-verde-light disabled:opacity-30"><Icon name="minus" size={13} /></button>
+                              <span className="tnum w-6 text-center text-sm font-bold text-creme">{item.qty}</span>
+                              <button type="button" onClick={() => setQty(item.id, item.qty + 1)} disabled={item.qty >= 9} data-testid={'cart-plus-' + item.id} aria-label="Aumentar quantidade" className="flex h-7 w-7 items-center justify-center rounded-full text-creme/70 transition-colors duration-300 hover:text-verde-light disabled:opacity-30"><Icon name="plus" size={13} /></button>
+                            </div>
+                            <p className="tnum font-heading text-sm font-black text-verde-light">{formatBRL(item.price_cents * item.qty)}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="border-t border-creme/10 px-6 py-5">
+                  <div className="flex items-center justify-between text-sm text-creme/70"><span>Subtotal</span><span className="tnum font-heading text-lg font-black text-creme">{formatBRL(cartSubtotal)}</span></div>
+                  <p className="mt-1 text-xs text-creme/45">Frete e impostos calculados na finalização.</p>
+                  <button type="button" onClick={checkout} disabled={stage === 'processing'} data-testid="cart-checkout" className="btn-primary mt-4 w-full disabled:opacity-70">
+                    {stage === 'processing' ? <React.Fragment><Icon name="loader" size={18} className="animate-spin" /> Registrando pedido...</React.Fragment> : <React.Fragment>Finalizar compra <Icon name="arrow-right" size={18} /></React.Fragment>}
+                  </button>
+                </div>
+              </React.Fragment>
+            )}
+          </motion.aside>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ---------- Modal Nijias (mundo oficial) ---------- */
+function NijiasModal() {
+  const { nijiasOpen, setNijiasOpen, setStoreExpanded } = useApp();
+  const close = React.useCallback(() => setNijiasOpen(false), [setNijiasOpen]);
+  const goStore = () => { setStoreExpanded(true); close(); setTimeout(() => scrollToId('loja'), 220); };
+  const feats = [
+    { icon: 'book', title: 'Aventura pronta para mestrar', desc: 'Uma campanha completa de Nijias, do primeiro dado ao clímax.' },
+    { icon: 'map', title: 'Mapas de Ramumako', desc: 'Regiões, rotas e segredos cartografados para a sua mesa.' },
+    { icon: 'swords', title: 'Bestiário oficial', desc: 'Criaturas, facções e ameaças com fichas prontas para uso.' },
+    { icon: 'shield', title: 'Kit do Mestre', desc: 'Escudo, tabelas de referência e ferramentas de narração.' },
+  ];
+  return (
+    <ModalShell open={nijiasOpen} onClose={close} labelledBy="nijias-title" wide>
+      <div className="-mx-8 -mt-8 h-44 overflow-hidden rounded-t-3xl bg-gradient-to-br from-violeta-mid to-violeta-darker">
+        <div className="relative flex h-full items-center justify-center">
+          <div aria-hidden="true" className="aurora left-8 top-0 h-40 w-40 bg-verde/25" />
+          <div aria-hidden="true" className="aurora right-8 bottom-0 h-40 w-40 bg-arcana/30" style={{ animationDelay: '3s' }} />
+          <div className="relative flex items-center gap-5">
+            <D20Svg size={72} variant="luck" />
+            <span className="font-heading text-4xl font-black tracking-tight text-creme">NIJIAS</span>
+          </div>
+        </div>
+      </div>
+      <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-verde-soft">O mundo oficial da +1 RPG</p>
+      <h2 id="nijias-title" className="mt-2 font-heading text-2xl font-black tracking-tight text-creme">Uma terra feita para a sua mesa.</h2>
+      <p className="mt-3 leading-relaxed text-creme/70">Nijias é o cenário oficial da +1 RPG: um mundo de guildas, névoas arcanas e cidades-fronteira, escrito para acolher tanto a primeira sessão quanto campanhas de anos. Cada suplemento nasce com a comunidade — e chega à loja em edição física e digital.</p>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        {feats.map((f) => (
+          <div key={f.title} className="rounded-2xl border border-creme/10 p-4">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-verde/15 text-verde-light"><Icon name={f.icon} size={18} /></span>
+            <p className="mt-3 font-heading text-sm font-bold text-creme">{f.title}</p>
+            <p className="mt-1 text-xs leading-relaxed text-creme/60">{f.desc}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+        <button type="button" onClick={goStore} data-testid="nijias-go-store" className="btn-primary flex-1"><Icon name="book" size={18} /> Ver livro de aventura na loja</button>
+        <button type="button" onClick={close} data-testid="nijias-close" className="btn-ghost flex-1">Voltar à página</button>
+      </div>
+    </ModalShell>
+  );
+}
+
+/* ---------- Navbar ---------- */
+const NAV_LINKS = [
+  { label: 'Mesas', target: 'mesas' }, { label: 'Planos', target: 'planos' }, { label: 'Loja', target: 'loja' },
+  { label: 'Comunidade', target: 'depoimentos' }, { label: 'Nijias', nijias: true },
+];
+function Navbar() {
+  const { user, logout, openAuth, cartCount, setCartOpen, setNijiasOpen } = useApp();
+  const [active, setActive] = React.useState('topo');
+  const [scrolled, setScrolled] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const drawerRef = React.useRef(null);
+  React.useEffect(() => {
+    const ids = ['topo', ...NAV_LINKS.filter((l) => l.target).map((l) => l.target)];
+    const obs = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setActive(e.target.id)), { rootMargin: '-40% 0px -55% 0px' });
+    ids.forEach((id) => { const el = document.getElementById(id); if (el) obs.observe(el); });
+    return () => obs.disconnect();
+  }, []);
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  React.useEffect(() => {
+    if (open) lockScroll(); else unlockScroll();
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const onChange = () => mq.matches && setOpen(false);
+    mq.addEventListener('change', onChange);
+    return () => { mq.removeEventListener('change', onChange); if (open) unlockScroll(); };
+  }, [open]);
+  useFocusTrap(open, drawerRef, () => setOpen(false));
+  const go = (target) => { setOpen(false); setTimeout(() => scrollToId(target), 60); };
+  const ring = user && user.cosmetic ? RARITY_RING[user.cosmetic.rarity] || '#8BE06F' : null;
+  const cartBtn = (extra) => (
+    <button type="button" onClick={() => setCartOpen(true)} data-testid="nav-cart" aria-label={'Abrir carrinho com ' + cartCount + ' itens'}
+      className={'relative flex h-10 w-10 items-center justify-center rounded-full border border-creme/20 text-creme/80 transition-colors duration-300 hover:border-verde-light hover:text-verde-light ' + (extra || '')}>
+      <Icon name="shopping-cart" size={17} />
+      {cartCount > 0 && <span className="tnum absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-verde px-1 text-[11px] font-bold text-creme">{cartCount}</span>}
+    </button>
+  );
+  return (
+    <header className={'glass fixed inset-x-0 top-0 z-50 border-x-0 border-t-0 ' + (scrolled ? 'shadow-card' : '')}>
+      <nav aria-label="Navegação principal" className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-3 px-5 sm:px-8">
+        <a href="#topo" onClick={(e) => handleAnchor(e, 'topo')} data-testid="nav-logo" aria-label="+1 RPG — voltar ao topo" className="shrink-0"><BrandLogo height={38} /></a>
+        <div className="hidden items-center gap-1 lg:flex">
+          {NAV_LINKS.map((l) => l.nijias ? (
+            <button key={l.label} type="button" onClick={() => setNijiasOpen(true)} data-testid="nav-link-nijias"
+              className="rounded-full px-4 py-2 text-sm font-semibold text-creme/70 transition-colors duration-300 hover:bg-creme/5 hover:text-creme">{l.label}</button>
+          ) : (
+            <a key={l.target} href={'#' + l.target} onClick={(e) => handleAnchor(e, l.target)} data-testid={'nav-link-' + l.label.toLowerCase()}
+              aria-current={active === l.target ? 'true' : undefined}
+              className={'rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 ' + (active === l.target ? 'bg-verde/10 text-verde-light' : 'text-creme/70 hover:bg-creme/5 hover:text-creme')}>
+              {l.label}
+            </a>
+          ))}
+        </div>
+        <div className="hidden items-center gap-3 md:flex">
+          {cartBtn()}
+          {user ? (
+            <React.Fragment>
+              <span className="flex items-center gap-2 rounded-full border border-verde/40 bg-verde/10 py-1.5 pl-1.5 pr-4" title={user.cosmetic ? user.cosmetic.name : undefined}>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-verde/25 font-heading text-sm font-black text-verde-light"
+                  style={ring ? { boxShadow: '0 0 0 2px ' + ring + ', 0 0 14px ' + ring } : undefined}>
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+                <span className="max-w-[120px] truncate text-sm font-semibold text-creme">{user.name}</span>
+              </span>
+              <button type="button" onClick={logout} data-testid="nav-logout" aria-label="Sair da conta"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-creme/20 text-creme/70 transition-colors duration-300 hover:border-verde-light hover:text-verde-light">
+                <Icon name="log-out" size={17} />
+              </button>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <button type="button" onClick={() => openAuth('login')} data-testid="nav-login" className="px-3 py-2 text-sm font-semibold text-creme/80 transition-colors duration-300 hover:text-creme">Entrar</button>
+              <button type="button" onClick={() => openAuth('signup')} data-testid="nav-signup" className="btn-primary !px-5 !py-2.5 text-sm">Criar conta</button>
+            </React.Fragment>
+          )}
+        </div>
+        <div className="flex items-center gap-2 md:hidden">
+          {cartBtn()}
+          <button type="button" onClick={() => setOpen((o) => !o)} data-testid="nav-menu-toggle" aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-creme/20 text-creme lg:hidden">
+            <Icon name={open ? 'x' : 'menu'} size={20} />
+          </button>
+        </div>
+        <button type="button" onClick={() => setOpen((o) => !o)} data-testid="nav-menu-toggle-desktop" aria-expanded={open} aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+          className="hidden h-11 w-11 items-center justify-center rounded-full border border-creme/20 text-creme md:flex lg:hidden">
+          <Icon name={open ? 'x' : 'menu'} size={20} />
+        </button>
+      </nav>
+      <AnimatePresence>
+        {open && (
+          <motion.div key="drawer" ref={drawerRef} role="dialog" aria-modal="true" aria-label="Menu de navegação"
+            initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-x-0 top-[72px] z-40 max-h-[calc(100vh-72px)] overflow-y-auto border-b border-creme/10 bg-violeta-deep/95 p-5 backdrop-blur-xl lg:hidden">
+            <div className="flex flex-col gap-2">
+              {NAV_LINKS.map((l) => l.nijias ? (
+                <button key={l.label} type="button" onClick={() => { setOpen(false); setNijiasOpen(true); }} data-testid="drawer-link-nijias"
+                  className="w-full rounded-xl bg-creme/5 px-4 py-3.5 text-left font-heading font-bold text-creme transition-colors duration-300 hover:bg-verde/15 hover:text-verde-light">{l.label}</button>
+              ) : (
+                <button key={l.target} type="button" onClick={() => go(l.target)} data-testid={'drawer-link-' + l.label.toLowerCase()}
+                  className="w-full rounded-xl bg-creme/5 px-4 py-3.5 text-left font-heading font-bold text-creme transition-colors duration-300 hover:bg-verde/15 hover:text-verde-light">{l.label}</button>
+              ))}
+              <div className="my-2 h-px bg-creme/10" />
+              {user ? (
+                <button type="button" onClick={() => { logout(); setOpen(false); }} data-testid="drawer-logout" className="btn-ghost w-full"><Icon name="log-out" size={17} /> Sair da conta ({user.name})</button>
+              ) : (
+                <React.Fragment>
+                  <button type="button" onClick={() => { setOpen(false); openAuth('login'); }} data-testid="drawer-login" className="btn-ghost w-full">Entrar</button>
+                  <button type="button" onClick={() => { setOpen(false); openAuth('signup'); }} data-testid="drawer-signup" className="btn-primary w-full">Criar conta</button>
+                </React.Fragment>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
+  );
+}
+
+/* ---------- 1 · Hero ---------- */
+const HERO_LINES = ['Falta', '+1', 'na mesa?'];
+const TRUST = [{ icon: 'search', label: 'Para iniciantes e veteranos' }, { icon: 'map-pin', label: 'Online e presencial' }, { icon: 'users', label: 'Comunidade acolhedora' }];
+function Hero() {
+  const heroRef = React.useRef(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const yCritin = useTransform(scrollYProgress, [0, 1], [0, 140]);
+  const rotateCritin = useTransform(scrollYProgress, [0, 1], [0, -8]);
+  const yDiceA = useTransform(scrollYProgress, [0, 1], [0, -110]);
+  const yDiceB = useTransform(scrollYProgress, [0, 1], [0, 70]);
+  const fadeUp = (delay) => ({ initial: reduce ? false : { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] } });
+  return (
+    <section id="topo" ref={heroRef} className="relative overflow-hidden scroll-mt-24">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="aurora -left-40 top-24 h-[480px] w-[480px] bg-verde/15" />
+        <div className="aurora right-[-120px] top-[-80px] h-[380px] w-[380px] bg-arcana/15" style={{ animationDelay: '4s' }} />
+        <div className="absolute right-[4%] top-[16%] hidden h-[560px] w-[560px] rounded-full border border-creme/5 lg:block" />
+        <div className="absolute right-[12%] top-[28%] hidden h-[380px] w-[380px] rounded-full border border-creme/5 lg:block" />
+      </div>
+      <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 pb-20 pt-32 sm:px-8 lg:min-h-[92vh] lg:grid-cols-[1.1fr_0.9fr] lg:pb-24 lg:pt-36">
+        <div className="text-center lg:text-left">
+          <motion.div {...fadeUp(0)} className="flex justify-center lg:justify-start"><Eyebrow icon="sparkles">Sua próxima aventura começa aqui</Eyebrow></motion.div>
+          <h1 className="mt-6 font-heading text-5xl font-black leading-[0.98] tracking-tighter text-creme sm:text-6xl md:text-7xl xl:text-8xl">
+            {HERO_LINES.map((line, i) => (
+              <span key={line} className="mask-line pr-[0.12em]">
+                <motion.span className={'block ' + (i === 1 ? 'italic text-verde-light' : '')}
+                  initial={reduce ? false : { y: '110%' }} animate={{ y: 0 }}
+                  transition={{ duration: 0.9, delay: 0.15 + i * 0.14, ease: [0.22, 1, 0.36, 1] }}>
+                  {line}
+                </motion.span>
+              </span>
+            ))}
+          </h1>
+          <motion.p {...fadeUp(0.65)} className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-creme/70 sm:text-lg lg:mx-0">
+            Encontre jogadores, Mestres e campanhas. A +1 RPG nasceu da conexão entre pessoas — e aproxima você de quem também quer jogar, do primeiro dado à campanha épica.
+          </motion.p>
+          <motion.div {...fadeUp(0.8)} className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
+            <a href="#mesas" onClick={(e) => handleAnchor(e, 'mesas')} data-testid="hero-cta-find-table" className="btn-primary w-full sm:w-auto"><Icon name="dices" size={19} /> Encontrar minha mesa</a>
+            <a href="#modos" onClick={(e) => handleAnchor(e, 'modos')} data-testid="hero-cta-master" className="btn-ghost w-full sm:w-auto"><Icon name="swords" size={19} /> Sou Mestre</a>
+          </motion.div>
+          <motion.ul {...fadeUp(1)} className="mt-9 flex flex-wrap items-center justify-center gap-x-5 gap-y-2.5 lg:justify-start">
+            {TRUST.map(({ icon, label }, i) => (
+              <li key={label} className="flex items-center gap-2 text-sm text-creme/70">
+                {i > 0 && <span aria-hidden="true" className="mr-3 hidden h-1 w-1 rounded-full bg-creme/25 sm:block" />}
+                <Icon name={icon} size={16} className="text-verde-light" />{label}
+              </li>
+            ))}
+          </motion.ul>
+        </div>
+        <div className="relative mx-auto flex h-[380px] w-full max-w-[520px] items-center justify-center sm:h-[480px] lg:h-[580px]">
+          <div aria-hidden="true" className="absolute aspect-square h-[82%] animate-spin-slow rounded-full border-2 border-dashed border-creme/15">
+            <span className="absolute left-1/2 top-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-verde-light shadow-[0_0_16px_#8BE06F]" />
+          </div>
+          <div aria-hidden="true" className="absolute aspect-square h-[60%] rounded-full bg-verde/10 blur-[80px]" />
+          <motion.div style={reduce ? {} : { y: yCritin, rotate: rotateCritin }} className="relative z-10 flex w-full justify-center">
+            <CritinArt pose="hero" eager className="w-[86%] max-w-[520px] drop-shadow-[0_30px_60px_rgba(18,6,38,0.6)]"
+              label="Critin, mascote mágico da +1 RPG, acenando e segurando um d20 brilhante" />
+          </motion.div>
+          <motion.div style={reduce ? {} : { y: yDiceA }} className="absolute left-0 top-6 z-20 sm:left-4"><div className="animate-float-slow"><D20Svg size={84} /></div></motion.div>
+          <motion.div style={reduce ? {} : { y: yDiceB }} className="absolute bottom-16 right-0 z-20 sm:right-4"><div className="animate-float-slow" style={{ animationDelay: '1.6s' }}><D20Svg size={60} /></div></motion.div>
+          <motion.div {...fadeUp(1.15)} className="absolute -bottom-2 left-1 z-30 sm:left-6">
+            <div className="glass flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-creme animate-float-slow" style={{ animationDelay: '2.4s' }}>
+              <Icon name="sparkles" size={16} className="text-verde-light" /> O Critin já separou os dados!
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1.5 text-creme/40 lg:flex">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.2em]">Role para explorar</span>
+        <span className="flex h-8 w-5 items-start justify-center rounded-full border border-creme/25 p-1"><span className="h-2 w-1 animate-float-slow rounded-full bg-verde-light" /></span>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 2 · Estatísticas ---------- */
+const STAT_ITEMS = [
+  { icon: 'compass', key: 'mesas', label: 'Mesas publicadas' }, { icon: 'dices', key: 'mesas_abertas', label: 'Mesas com vagas' },
+  { icon: 'users', key: 'jogadores', label: 'Jogadores' }, { icon: 'swords', key: 'mestres', label: 'Mestres' },
+];
+const fmtNum = new Intl.NumberFormat('pt-BR');
+function AnimatedNumber({ value }) {
+  const ref = React.useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-40px' });
+  const reduce = useReducedMotion();
+  const [display, setDisplay] = React.useState(null);
+  React.useEffect(() => {
+    if (value == null || !inView) return;
+    if (reduce) { setDisplay(value); return; }
+    const controls = animate(0, value, { duration: 1.4, ease: [0.22, 1, 0.36, 1], onUpdate: (v) => setDisplay(Math.round(v)) });
+    return () => controls.stop();
+  }, [value, inView, reduce]);
+  return <span ref={ref} className="tnum font-heading text-3xl font-black tracking-tight text-creme md:text-4xl">{value == null ? '—' : fmtNum.format(display ?? 0)}</span>;
+}
+function Stats() {
+  const { data } = useApi('/api/stats', seedStats);
+  return (
+    <section aria-label="Estatísticas da plataforma" className="border-y border-creme/10 bg-violeta-deep py-14">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-5 sm:px-8 lg:grid-cols-4">
+        {STAT_ITEMS.map(({ icon, key, label }, i) => (
+          <Reveal key={key} delay={i * 0.08}>
+            <div className="flex items-center gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-verde/15 text-verde-light"><Icon name={icon} size={22} /></span>
+              <span className="flex flex-col">
+                <AnimatedNumber value={data ? (data[key] ?? seedStats[key]) : null} />
+                <span className="text-sm text-creme/60">{label}</span>
+              </span>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 3 · Marquee ---------- */
+const PHRASES = ['MENOS BARREIRAS', 'MAIS HISTÓRIAS', 'MAIS UMA PESSOA', 'MAIS UMA AVENTURA'];
+const MarqueeRow = () => (
+  <div className="flex items-center gap-10 pr-10 md:gap-14 md:pr-14">
+    {PHRASES.map((p) => (
+      <span key={p} className="flex items-center gap-10 md:gap-14">
+        <span className="whitespace-nowrap font-heading text-3xl font-black uppercase tracking-tight text-violeta md:text-5xl">{p}</span>
+        <Icon name="sparkles" size={30} className="shrink-0 text-verde" />
+      </span>
+    ))}
+  </div>
+);
+function Marquee() {
+  return (
+    <section className="marquee overflow-hidden bg-creme py-6 md:py-8" aria-label="Menos barreiras. Mais histórias. Mais uma pessoa. Mais uma aventura.">
+      <div className="marquee-track" aria-hidden="true"><MarqueeRow /><MarqueeRow /></div>
+    </section>
+  );
+}
+
+/* ---------- 4 · Bento ---------- */
+const PLAY_BULLETS = ['Buscar por sistema, formato e nível', 'Ver vagas, horários e faixa etária', 'Salvar mesas e demonstrar interesse', 'Acompanhar suas solicitações'];
+const MASTER_BULLETS = ['Publicar mesas e definir vagas', 'Organizar solicitações e participantes', 'Pausar ou encerrar campanhas'];
+const ATTRS = [{ icon: 'compass', label: 'Aventureiro' }, { icon: 'users', label: 'Conector' }, { icon: 'sparkles', label: 'Curioso' }, { icon: 'shield', label: 'Acolhedor' }];
+function Modes() {
+  const { openPublish } = useApp();
+  return (
+    <section id="modos" className="relative overflow-hidden scroll-mt-24 py-24 md:py-28">
+      <div aria-hidden="true" className="aurora -right-32 top-10 h-[420px] w-[420px] bg-verde/10" />
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+        <Reveal>
+          <Eyebrow icon="compass">Uma plataforma, dois caminhos</Eyebrow>
+          <h2 className="mt-4 font-heading text-4xl font-black tracking-tight text-creme md:text-5xl">Seu jeito de viver o RPG.</h2>
+          <p className="mt-5 max-w-2xl leading-relaxed text-creme/70">Você quer encontrar uma aventura ou reunir pessoas para conduzir uma? A +1 RPG tem um espaço pensado para cada papel.</p>
+        </Reveal>
+        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+          <Reveal className="lg:col-span-2" delay={0}>
+            <article className="lift card-surface relative h-full overflow-hidden rounded-3xl p-8 md:p-10">
+              <div aria-hidden="true" className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-verde/10 blur-[70px]" />
+              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-verde text-creme"><Icon name="dices" size={26} /></span>
+              <h3 className="mt-6 font-heading text-2xl font-bold text-creme md:text-3xl">Quero jogar</h3>
+              <p className="mt-3 max-w-lg leading-relaxed text-creme/70">Descubra mesas que combinam com seu estilo, agenda e experiência.</p>
+              <ul className="mt-7 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                {PLAY_BULLETS.map((b) => (
+                  <li key={b} className="flex items-start gap-2.5 text-sm leading-relaxed text-creme/75"><Icon name="check" size={17} className="mt-0.5 shrink-0 text-verde-light" />{b}</li>
+                ))}
+              </ul>
+              <a href="#mesas" onClick={(e) => handleAnchor(e, 'mesas')} data-testid="modes-cta-find" className="btn-primary mt-9">Encontrar uma mesa <Icon name="arrow-right" size={18} /></a>
+            </article>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <article className="lift relative h-full rounded-3xl border border-verde/25 bg-gradient-to-br from-verde/20 to-grafite p-8">
+              <span className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-verde-light text-verde-light"><Icon name="swords" size={26} /></span>
+              <h3 className="mt-6 font-heading text-2xl font-bold text-creme">Sou Mestre</h3>
+              <p className="mt-3 leading-relaxed text-creme/70">Crie sua mesa, apresente sua campanha e encontre os jogadores certos.</p>
+              <ul className="mt-7 space-y-3">
+                {MASTER_BULLETS.map((b) => (
+                  <li key={b} className="flex items-start gap-2.5 text-sm leading-relaxed text-creme/75"><Icon name="check" size={17} className="mt-0.5 shrink-0 text-verde-light" />{b}</li>
+                ))}
+              </ul>
+              <button type="button" onClick={openPublish} data-testid="modes-cta-publish" className="btn-ghost mt-9 w-full">Publicar minha mesa</button>
+            </article>
+          </Reveal>
+          <Reveal delay={0.16}>
+            <article className="lift card-surface flex h-full items-center gap-5 rounded-3xl p-8">
+              <CritinArt mood="feliz" dice={false} className="w-24 shrink-0 drop-shadow-[0_12px_24px_rgba(18,6,38,0.6)]" label="Critin feliz, comemorando a sua vaga aprovada na mesa" />
+              <div>
+                <h3 className="font-heading text-xl font-bold text-creme">O Critin está por perto!</h3>
+                <p className="mt-2 text-sm leading-relaxed text-creme/65">Ele guia você na busca, explica cada etapa e comemora quando a sua vaga é aprovada.</p>
+              </div>
+            </article>
+          </Reveal>
+          <Reveal className="lg:col-span-2" delay={0.24}>
+            <div className="grid h-full grid-cols-2 gap-4 sm:grid-cols-4">
+              {ATTRS.map(({ icon, label }) => (
+                <div key={label} className="lift flex flex-col items-center justify-center gap-3 rounded-2xl border border-creme/10 p-6">
+                  <Icon name={icon} size={26} className="text-verde-light" />
+                  <span className="font-heading font-bold text-creme">{label}</span>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 5 · Temas ---------- */
+function Themes() {
+  const { data } = useApi('/api/themes', seedThemes);
+  const { setThemeFilter, pushToast } = useApp();
+  const trackRef = React.useRef(null);
+  const [canPrev, setCanPrev] = React.useState(false);
+  const [canNext, setCanNext] = React.useState(true);
+  const themes = seedThemes.map((t) => {
+    const hit = Array.isArray(data) && data.find((d) => (d.slug || d.id) === t.slug);
+    return { ...t, count: hit ? (hit.count ?? hit.mesas ?? t.count) : t.count };
+  });
+  const updateArrows = () => {
+    const el = trackRef.current; if (!el) return;
+    setCanPrev(el.scrollLeft > 4);
+    setCanNext(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  };
+  React.useEffect(() => {
+    updateArrows();
+    window.addEventListener('resize', updateArrows);
+    return () => window.removeEventListener('resize', updateArrows);
+  }, []);
+  const scrollBy = (dir) => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (trackRef.current) trackRef.current.scrollBy({ left: dir * 420, behavior: reduce ? 'auto' : 'smooth' });
+  };
+  const pick = (t) => { setThemeFilter(t.slug); pushToast('Filtrando mesas de ' + t.name + '.'); setTimeout(() => scrollToId('mesas'), 150); };
+  const arrowCls = 'flex h-12 w-12 items-center justify-center rounded-full border border-creme/20 text-creme/70 transition-colors duration-300 hover:border-verde-light hover:text-verde-light disabled:pointer-events-none disabled:opacity-30';
+  return (
+    <section id="temas" className="scroll-mt-24 border-t border-creme/5 bg-violeta-deep py-24 md:py-28">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <Eyebrow icon="map-pin">Temas e gêneros</Eyebrow>
+              <h2 className="mt-4 font-heading text-4xl font-black tracking-tight text-creme md:text-5xl">Escolha seu mundo.</h2>
+              <p className="mt-5 leading-relaxed text-creme/70">Seis portais com o Critin em cena — descubra mesas do clima que você quer viver.</p>
+            </div>
+            <div className="flex gap-3">
+              <button type="button" onClick={() => scrollBy(-1)} disabled={!canPrev} data-testid="themes-prev" aria-label="Temas anteriores" className={arrowCls}><Icon name="chevron-left" size={22} /></button>
+              <button type="button" onClick={() => scrollBy(1)} disabled={!canNext} data-testid="themes-next" aria-label="Próximos temas" className={arrowCls}><Icon name="chevron-right" size={22} /></button>
+            </div>
+          </div>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div ref={trackRef} onScroll={updateArrows} role="region" aria-label="Carrossel de temas em destaque"
+            className="no-scrollbar -mx-5 mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8">
+            {themes.map((t) => (
+              <button key={t.slug} type="button" onClick={() => pick(t)} data-testid={'theme-card-' + t.slug}
+                aria-label={'Ver mesas de ' + t.name}
+                className="lift group relative w-[300px] shrink-0 snap-start overflow-hidden rounded-3xl card-surface text-left sm:w-[340px]">
+                <div className="aspect-[3/2] overflow-hidden">
+                  <ThemeArt slug={t.slug} label={'Ilustração do tema ' + t.name + ' com o Critin em cena'} className="h-full w-full transition-transform duration-500 group-hover:scale-105" />
+                </div>
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-violeta-darker via-violeta-darker/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="font-heading text-lg font-bold leading-snug text-creme">{t.name}</h3>
+                    <span className="tnum shrink-0 rounded-full bg-verde px-2.5 py-1 text-xs font-bold text-creme">{t.count} mesas</span>
+                  </div>
+                  <p className="mt-2 text-xs leading-relaxed text-creme/65">{t.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 6 · Mesas (explorador completo) ---------- */
+function normalizeTable(t, i) {
+  return {
+    id: t.id || 'mesa-' + i, title: t.title || t.titulo || 'Mesa sem título', system: t.system || t.sistema || 'Sistema a definir',
+    master: t.master_name || (t.mestre && t.mestre.nome) || t.mestre || t.master || 'Mestre da comunidade',
+    format: t.format || t.formato || 'online', location: t.location || t.cidade || null,
+    slots: t.slots_left ?? t.vagas_restantes ?? t.vagas ?? t.slots ?? 0,
+    schedule: t.schedule || t.horario || 'A combinar', tags: Array.isArray(t.tags) ? t.tags.slice(0, 3) : [],
+    theme: t.theme_slug || t.tema_slug || t.theme || 'fantasia-medieval-classica', mine: !!t.mine,
+  };
+}
+const SkeletonCard = () => (
+  <div className="card-surface animate-pulse rounded-3xl p-6" aria-hidden="true">
+    <div className="h-40 rounded-2xl bg-creme/10" /><div className="mt-5 h-5 w-3/4 rounded bg-creme/10" /><div className="mt-3 h-4 w-1/2 rounded bg-creme/10" /><div className="mt-6 h-10 rounded-full bg-creme/10" />
+  </div>
+);
+function TableCard({ table: t, index, onOpen }) {
+  const { interests, removeTable } = useApp();
+  const online = t.format === 'online';
+  const interested = interests.includes(t.id);
+  return (
+    <article className="lift group card-surface flex h-full flex-col overflow-hidden rounded-3xl" data-testid={'table-card-' + t.id}>
+      <div className="relative h-44 overflow-hidden">
+        <ThemeArt slug={t.theme} uid={'t' + index + t.theme} label={'Arte da mesa ' + t.title} className="h-full w-full transition-transform duration-500 group-hover:scale-105" />
+        {t.mine && <span className="absolute left-4 top-4 rounded-full bg-ouro px-2.5 py-1 text-xs font-bold text-violeta-darker">Sua mesa</span>}
+        {interested && <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-verde px-2.5 py-1 text-xs font-bold text-creme"><Icon name="heart" size={12} fill="currentColor" /> Interesse enviado</span>}
+      </div>
+      <div className="flex flex-1 flex-col p-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="chip border-verde/40 text-verde-light">{t.system}</span>
+          <span className="chip"><Icon name={online ? 'monitor' : 'map-pin'} size={13} />{online ? 'Online' : 'Presencial'}</span>
+        </div>
+        <h3 className="mt-4 font-heading text-xl font-bold leading-snug text-creme">{t.title}</h3>
+        <div className="mt-3 flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-creme/15 bg-violeta-mid font-heading text-sm font-black text-verde-light">{String(t.master).charAt(0).toUpperCase()}</span>
+          <span className="text-sm text-creme/60">Mestrada por <span className="font-semibold text-creme/85">{t.master}</span></span>
+        </div>
+        <ul className="mt-5 space-y-2.5 text-sm text-creme/70">
+          <li className="flex items-center gap-2.5"><Icon name="users" size={16} className="text-verde-light" /><span className="tnum font-semibold text-verde-light">{t.slots} {t.slots === 1 ? 'vaga restante' : 'vagas restantes'}</span></li>
+          <li className="flex items-center gap-2.5"><Icon name="clock" size={16} className="text-verde-light" /> {t.schedule}</li>
+          {!online && t.location && <li className="flex items-center gap-2.5"><Icon name="map-pin" size={16} className="text-verde-light" /> {t.location}</li>}
+        </ul>
+        {t.tags.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{t.tags.map((tag) => <span key={tag} className="chip">{tag}</span>)}</div>}
+        <div className="mt-6 flex gap-2">
+          <button type="button" onClick={() => onOpen(t)} data-testid={'table-view-' + t.id} className="btn-primary flex-1 !py-3 text-sm">Ver mesa</button>
+          {t.mine && (
+            <button type="button" onClick={() => removeTable(t.id)} data-testid={'table-close-' + t.id} aria-label={'Encerrar mesa ' + t.title}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-creme/20 text-creme/60 transition-colors duration-300 hover:border-ouro hover:text-ouro">
+              <Icon name="x" size={16} />
+            </button>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
+function TableDetailModal({ table, onClose }) {
+  const { interests, toggleInterest, pushToast } = useApp();
+  const t = table;
+  const theme = seedThemes.find((x) => x.slug === (t && t.theme));
+  const interested = t && interests.includes(t.id);
+  const share = () => {
+    const url = window.location.origin + window.location.pathname + '#mesa-' + t.id;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => pushToast('Link da mesa copiado para a área de transferência.')).catch(() => pushToast('Não foi possível copiar o link.'));
+    } else pushToast('Link da mesa: ' + url);
+  };
+  return (
+    <ModalShell open={!!t} onClose={onClose} labelledBy="table-detail-title" wide>
+      {t && (
+        <div>
+          <div className="-mx-8 -mt-8 h-48 overflow-hidden rounded-t-3xl">
+            <ThemeArt slug={t.theme} uid={'detail-' + t.id} label={'Arte da mesa ' + t.title} className="h-full w-full" />
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <span className="chip border-verde/40 text-verde-light">{t.system}</span>
+            <span className="chip"><Icon name={t.format === 'online' ? 'monitor' : 'map-pin'} size={13} />{t.format === 'online' ? 'Online' : 'Presencial'}</span>
+            {t.tags.map((tag) => <span key={tag} className="chip">{tag}</span>)}
+          </div>
+          <h2 id="table-detail-title" className="mt-4 font-heading text-3xl font-black tracking-tight text-creme">{t.title}</h2>
+          <p className="mt-3 leading-relaxed text-creme/70">
+            {theme ? theme.desc + ' ' : ''}Uma campanha conduzida por <span className="font-semibold text-creme">{t.master}</span>, com sessões {t.schedule.toLowerCase()}.
+            {t.slots === 1 ? ' Resta apenas 1 vaga — o Critin recomenda não dormir no ponto.' : ' Há ' + t.slots + ' vagas abertas para novos aventureiros.'}
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-creme/10 p-4"><p className="text-xs uppercase tracking-[0.2em] text-verde-soft">Vagas</p><p className="tnum mt-1 font-heading text-2xl font-black text-creme">{t.slots}</p></div>
+            <div className="rounded-2xl border border-creme/10 p-4"><p className="text-xs uppercase tracking-[0.2em] text-verde-soft">Encontros</p><p className="mt-1 font-heading text-lg font-bold text-creme">{t.schedule}</p></div>
+            <div className="rounded-2xl border border-creme/10 p-4"><p className="text-xs uppercase tracking-[0.2em] text-verde-soft">Local</p><p className="mt-1 font-heading text-lg font-bold text-creme">{t.format === 'online' ? 'Mesa online' : (t.location || 'A combinar')}</p></div>
+          </div>
+          <div className="mt-5 flex items-start gap-3 rounded-2xl border border-verde/25 bg-verde/10 p-4">
+            <Icon name="shield" size={18} className="mt-0.5 shrink-0 text-verde-light" />
+            <p className="text-sm leading-relaxed text-creme/75"><span className="font-semibold text-creme">Declaração de convivência:</span> sessão zero antes do início, respeito acima de qualquer regra e temas sensíveis combinados com o grupo. Espaço seguro para iniciantes.</p>
+          </div>
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <button type="button" data-testid="table-interest" onClick={() => toggleInterest(t.id, t.title)}
+              className={(interested ? 'btn-ghost !border-verde-light/60 !text-verde-light' : 'btn-primary') + ' flex-1'}>
+              <Icon name={interested ? 'check' : 'heart'} size={18} />
+              {interested ? 'Interesse enviado' : 'Demonstrar interesse'}
+            </button>
+            <button type="button" data-testid="table-share" onClick={share} className="btn-ghost !px-5" aria-label="Copiar link da mesa"><Icon name="link" size={18} /> Compartilhar</button>
+          </div>
+        </div>
+      )}
+    </ModalShell>
+  );
+}
+function FeaturedTables() {
+  const { data, loading, error } = useApi('/api/tables?limit=3&available=true', seedTables);
+  const { openPublish, userTables, themeFilter, setThemeFilter } = useApp();
+  const [showAll, setShowAll] = React.useState(false);
+  const [detail, setDetail] = React.useState(null);
+  const [query, setQuery] = React.useState('');
+  const [format, setFormat] = React.useState('todas');
+  const [sort, setSort] = React.useState('relevancia');
+  const base = (Array.isArray(data) ? data : seedTables).map(normalizeTable);
+  const merged = [...userTables.map((t, i) => normalizeTable(t, 100 + i)), ...base];
+  // Link compartilhado #mesa-id abre o detalhe direto.
+  React.useEffect(() => {
+    const m = window.location.hash.match(/^#mesa-(.+)$/);
+    if (m) { const hit = merged.find((t) => t.id === m[1]); if (hit) setDetail(hit); }
+  }, []);
+  let filtered = merged;
+  if (themeFilter) filtered = filtered.filter((t) => t.theme === themeFilter);
+  if (format !== 'todas') filtered = filtered.filter((t) => t.format === format);
+  if (query.trim()) {
+    const q = query.trim().toLowerCase();
+    filtered = filtered.filter((t) => (t.title + ' ' + t.system + ' ' + t.master).toLowerCase().includes(q));
+  }
+  if (sort === 'vagas') filtered = [...filtered].sort((a, b) => b.slots - a.slots);
+  if (sort === 'titulo') filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'));
+  const tables = showAll ? filtered : filtered.slice(0, 3);
+  const themeName = themeFilter ? (seedThemes.find((t) => t.slug === themeFilter) || {}).name : null;
+  const hasFilters = themeFilter || format !== 'todas' || query.trim() || sort !== 'relevancia';
+  const clearFilters = () => { setThemeFilter(null); setFormat('todas'); setQuery(''); setSort('relevancia'); };
+  const fmtPill = (v, label) => (
+    <button type="button" onClick={() => setFormat(v)} data-testid={'tables-format-' + v} aria-pressed={format === v}
+      className={'rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 ' + (format === v ? 'bg-verde text-creme' : 'border border-creme/15 text-creme/65 hover:border-verde-light/50 hover:text-creme')}>
+      {label}
+    </button>
+  );
+  return (
+    <section id="mesas" className="relative scroll-mt-24 overflow-hidden bg-violeta-deep py-24 md:py-28">
+      <div aria-hidden="true" className="aurora -left-32 bottom-0 h-[420px] w-[420px] bg-verde/10" />
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <Eyebrow icon="search">Encontre sua mesa</Eyebrow>
+              <h2 className="mt-4 font-heading text-4xl font-black tracking-tight text-creme md:text-5xl">Uma aventura está esperando.</h2>
+              {themeName && (
+                <button type="button" onClick={() => setThemeFilter(null)} data-testid="tables-clear-filter"
+                  className="mt-4 inline-flex items-center gap-2 rounded-full border border-verde-light/50 bg-verde/10 px-4 py-1.5 text-sm font-semibold text-verde-light transition-colors duration-300 hover:bg-verde/20">
+                  Tema: {themeName} <Icon name="x" size={14} />
+                </button>
+              )}
+            </div>
+            <button type="button" onClick={() => { setShowAll((s) => !s); if (showAll) clearFilters(); else setThemeFilter(null); }} data-testid="tables-see-all" className="btn-ghost !px-5 !py-2.5 text-sm">
+              {showAll ? 'Ver menos mesas' : 'Ver todas as mesas'} <Icon name="arrow-right" size={16} />
+            </button>
+          </div>
+        </Reveal>
+
+        {showAll && (
+          <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-creme/10 bg-violeta-mid/30 p-4 lg:flex-row lg:items-center">
+            <div className="relative flex-1">
+              <Icon name="search" size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-creme/40" />
+              <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} data-testid="tables-search"
+                placeholder="Buscar por título, sistema ou Mestre" aria-label="Buscar mesas" className="input !pl-11" />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {fmtPill('todas', 'Todas')}
+              {fmtPill('online', 'Online')}
+              {fmtPill('presencial', 'Presencial')}
+            </div>
+            <div className="relative">
+              <Icon name="sort" size={15} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-creme/40" />
+              <select value={sort} onChange={(e) => setSort(e.target.value)} data-testid="tables-sort" aria-label="Ordenar mesas" className="input !w-auto !pl-10 !pr-9 appearance-none">
+                <option value="relevancia">Relevância</option>
+                <option value="vagas">Mais vagas</option>
+                <option value="titulo">Título A–Z</option>
+              </select>
+              <Icon name="chevron-down" size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-creme/40" />
+            </div>
+          </div>
+        )}
+        {showAll && (
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <p className="tnum text-sm text-creme/60" role="status">{filtered.length} {filtered.length === 1 ? 'mesa encontrada' : 'mesas encontradas'}</p>
+            {hasFilters && <button type="button" onClick={clearFilters} data-testid="tables-clear-all" className="text-sm font-semibold text-verde-light underline-offset-4 hover:underline">Limpar filtros</button>}
+          </div>
+        )}
+
+        <div className="mt-10">
+          {loading && (
+            <div className="mb-8 flex items-center justify-center gap-4" role="status">
+              <CritinArt mood="curioso" dice={false} className="w-16 shrink-0 animate-float-slow" label="Critin curioso farejando mesas com vagas" />
+              <p className="text-sm text-creme/70">O Critin está farejando mesas com vagas...</p>
+            </div>
+          )}
+          {!loading && error && (
+            <div className="mb-8 flex items-center justify-center gap-3" role="status">
+              <CritinArt mood="preocupado" dice={false} className="w-12 shrink-0" label="Critin preocupado: não foi possível atualizar as mesas" />
+              <p className="text-sm text-creme/60">Não foi possível atualizar agora — exibindo mesas de exemplo.</p>
+            </div>
+          )}
+          {!loading && tables.length === 0 ? (
+            <div className="flex flex-col items-center gap-5 py-10 text-center">
+              <CritinArt mood="triste" dice={false} className="w-28" label="Critin triste: nenhuma mesa com vagas neste filtro" />
+              <p className="max-w-md leading-relaxed text-creme/70">Nenhuma mesa com vagas por aqui agora. Que tal abrir a sua e chamar a comunidade?</p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                {hasFilters && <button type="button" onClick={clearFilters} data-testid="tables-empty-clear" className="btn-ghost">Limpar filtros</button>}
+                <button type="button" onClick={openPublish} data-testid="tables-empty-publish" className="btn-primary">Publicar minha mesa</button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {loading ? [0, 1, 2].map((i) => <SkeletonCard key={i} />)
+                : tables.map((t, i) => (
+                  <Reveal key={t.id} delay={(i % 3) * 0.08}><TableCard table={t} index={i} onOpen={setDetail} /></Reveal>
+                ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <TableDetailModal table={detail} onClose={() => setDetail(null)} />
+    </section>
+  );
+}
+
+/* ---------- 7 · Planos ---------- */
+const MATRIX = [
+  ['Participar de mesas', [1, 1, 1, 1]], ['Publicar e divulgar mesas', [1, 1, 1, 1]], ['Perfil básico', [1, 1, 1, 1]], ['Buscar e salvar favoritas', [1, 1, 1, 1]],
+  ['Fichas digitais personalizadas', [0, 1, 1, 1]], ['Tabletop oficial +1 RPG', [0, 1, 1, 1]], ['Tokens digitais', [0, 1, 1, 1]], ['Efeitos sonoros', [0, 1, 1, 1]],
+  ['Artes exclusivas de artistas parceiros', [0, 0, 1, 1]], ['Efeitos sonoros próprios', [0, 0, 1, 1]], ['Miniaturas exclusivas do Critin', [0, 0, 1, 1]], ['Kits físicos de dados', [0, 0, 1, 1]],
+  ['Cursos de narratologia, oratória e mestragem', [0, 0, 0, 1]], ['Caixa surpresa bimestral', [0, 0, 0, 1]], ['Suplementos patrocinados', [0, 0, 0, 1]],
+];
+function Plans() {
+  const { user, activatePlan } = useApp();
+  const [compare, setCompare] = React.useState(false);
+  return (
+    <section id="planos" className="relative scroll-mt-24 overflow-hidden py-24 md:py-28">
+      <div aria-hidden="true" className="aurora -left-40 top-1/3 h-[460px] w-[460px] bg-verde/10" />
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <Eyebrow icon="star">Planos</Eyebrow>
+              <h2 className="mt-4 font-heading text-4xl font-black tracking-tight text-creme md:text-5xl">Comece de graça. Cresça com o grupo.</h2>
+              <p className="mt-5 leading-relaxed text-creme/70">Participar e publicar mesas é grátis para sempre — os planos são para quem quer ferramentas, arte e recompensas físicas.</p>
+            </div>
+            <button type="button" onClick={() => setCompare((c) => !c)} data-testid="plans-compare" className="btn-ghost !px-5 !py-2.5 text-sm" aria-expanded={compare}>
+              {compare ? 'Fechar comparação' : 'Comparar planos'} <Icon name="arrow-right" size={16} />
+            </button>
+          </div>
+        </Reveal>
+        <div className="mt-16 grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {seedPlans.map((plan, i) => {
+            const active = user && user.plan === plan.slug;
+            const featured = plan.featured;
+            return (
+              <Reveal key={plan.slug} delay={i * 0.08} className="h-full">
+                <article className={'lift relative flex h-full flex-col rounded-3xl p-8 ' + (featured ? 'border-2 border-verde bg-gradient-to-b from-verde/20 to-grafite shadow-glow lg:scale-[1.02]' : 'card-surface')}>
+                  {featured && <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-verde px-4 py-1.5 font-heading text-xs font-bold uppercase tracking-wider text-creme">Mais popular</span>}
+                  {active && !featured && <span className="absolute -top-3 right-6 rounded-full border border-verde-light/50 bg-violeta-deep px-3 py-1 text-xs font-bold text-verde-light">Seu plano</span>}
+                  <h3 className="font-heading text-xl font-bold text-creme">{plan.name}</h3>
+                  <p className="mt-4 flex items-baseline gap-1.5"><span className="tnum font-heading text-4xl font-black tracking-tight text-creme">{plan.price}</span><span className="text-sm text-creme/50">/mês</span></p>
+                  <p className="mt-3 text-sm leading-relaxed text-creme/65">{plan.desc}</p>
+                  <div className="my-6 h-px bg-creme/10" />
+                  <ul className="flex-1 space-y-3">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2.5 text-sm leading-relaxed text-creme/75"><Icon name="check" size={17} className="mt-0.5 shrink-0 text-verde-light" />{f}</li>
+                    ))}
+                  </ul>
+                  <button type="button" onClick={() => !active && activatePlan(plan)} disabled={active} data-testid={'plan-choose-' + plan.slug}
+                    className={'mt-8 w-full !py-3 text-sm ' + (featured ? 'btn-primary' : 'btn-ghost') + (active ? ' pointer-events-none !border-verde-light/50 !text-verde-light' : '')}>
+                    {active ? <React.Fragment><Icon name="check" size={17} /> Plano ativo</React.Fragment> : plan.slug === 'aventureiro' ? 'Começar grátis' : 'Assinar ' + plan.name}
+                  </button>
+                </article>
+              </Reveal>
+            );
+          })}
+        </div>
+        <AnimatePresence>
+          {compare && (
+            <motion.div key="matrix" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-10 overflow-x-auto rounded-3xl card-surface" data-testid="plans-matrix">
+              <table className="w-full min-w-[680px] text-sm">
+                <thead>
+                  <tr className="border-b border-creme/10">
+                    <th className="sticky left-0 bg-grafite p-4 text-left font-heading text-creme/70">Recurso</th>
+                    {seedPlans.map((p) => <th key={p.slug} className={'p-4 text-center font-heading font-bold ' + (p.featured ? 'text-verde-light' : 'text-creme')}>{p.name}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {MATRIX.map(([label, cols], ri) => (
+                    <tr key={label} className={ri % 2 ? 'bg-creme/[0.03]' : ''}>
+                      <td className="sticky left-0 bg-grafite p-4 text-creme/75">{label}</td>
+                      {cols.map((v, ci) => (
+                        <td key={ci} className="p-4 text-center">
+                          {v ? <Icon name="check" size={17} className="mx-auto text-verde-light" /> : <span className="text-creme/25">—</span>}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 8 · Loja ---------- */
+const CATS = [
+  { key: 'todos', label: 'Todos' }, { key: 'vestuario', label: 'Vestuário' }, { key: 'dados', label: 'Dados' },
+  { key: 'miniaturas', label: 'Miniaturas' }, { key: 'livros', label: 'Livros' }, { key: 'acessorios', label: 'Acessórios' },
+];
+function ProductCard({ product, index }) {
+  const { addToCart } = useApp();
+  const [added, setAdded] = React.useState(false);
+  const timer = React.useRef(null);
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+  const onAdd = () => { addToCart(product); setAdded(true); clearTimeout(timer.current); timer.current = setTimeout(() => setAdded(false), 1600); };
+  return (
+    <article className="lift group flex h-full flex-col overflow-hidden rounded-3xl border border-violeta/10 bg-[#FFFBF5] shadow-sm">
+      <div className="relative h-48 overflow-hidden">
+        <div className="h-full w-full transition-transform duration-500 group-hover:scale-105">
+          <ProductArt art={product.art} official={product.official} uid={product.id + index} label={product.name} />
+        </div>
+        {product.plus && <span className="absolute left-3 top-3 rounded-full bg-violeta px-2.5 py-1 text-[11px] font-bold text-creme">Sob encomenda</span>}
+      </div>
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <h3 className="font-heading text-base font-bold leading-snug text-violeta md:text-lg">{product.name}</h3>
+        <p className="tnum mt-1.5 font-heading text-lg font-black text-verde-dark">{formatBRL(product.price_cents)}{product.plus ? '+' : ''}</p>
+        <button type="button" onClick={onAdd} data-testid={'store-add-' + product.id}
+          className={'mt-4 flex w-full items-center justify-center gap-2 rounded-full px-3 py-3 font-heading text-xs font-bold text-creme sm:text-sm ' + (added ? 'bg-verde' : 'bg-violeta hover:bg-verde')}
+          style={{ transition: 'background-color .25s, transform .25s cubic-bezier(.22,1,.36,1)' }}>
+          <Icon name={added ? 'check' : 'shopping-cart'} size={16} />
+          {added ? 'Adicionado!' : 'Adicionar ao carrinho'}
+        </button>
+      </div>
+    </article>
+  );
+}
+function Store() {
+  const { data, loading } = useApi('/api/products', seedProducts);
+  const { cartCount, setCartOpen, storeExpanded, setStoreExpanded } = useApp();
+  const [cat, setCat] = React.useState('todos');
+  const [sort, setSort] = React.useState('relevancia');
+  const all = (Array.isArray(data) && data.length ? data : seedProducts).map((p, i) => ({
+    id: p.id || 'prod-' + i, name: p.name || p.nome || 'Produto +1 RPG',
+    price_cents: p.price_cents ?? p.preco_centavos ?? 0, plus: !!p.plus,
+    cat: p.cat || 'acessorios', official: p.official || p.image || null,
+    art: p.art || ['moletom', 'camiseta', 'dados-7', 'dados-premium', 'miniatura', 'miniatura', 'livro', 'adesivos'][i % 8],
+  }));
+  let list = cat === 'todos' ? all : all.filter((p) => p.cat === cat);
+  if (sort === 'preco-asc') list = [...list].sort((a, b) => a.price_cents - b.price_cents);
+  if (sort === 'preco-desc') list = [...list].sort((a, b) => b.price_cents - a.price_cents);
+  if (sort === 'nome') list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  const products = storeExpanded ? list : all.slice(0, 4);
+  return (
+    <section id="loja" className="scroll-mt-24 bg-creme py-24 text-violeta md:py-28">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <Eyebrow icon="shopping-cart" tone="light">Loja oficial</Eyebrow>
+              <h2 className="mt-4 font-heading text-4xl font-black tracking-tight text-violeta md:text-5xl">Leve a aventura para casa.</h2>
+            </div>
+            <div className="flex items-center gap-3">
+              {cartCount > 0 && (
+                <button type="button" onClick={() => setCartOpen(true)} data-testid="store-cart-count"
+                  className="tnum flex items-center gap-2 rounded-full border border-violeta/20 bg-violeta/5 px-4 py-2 text-sm font-bold text-violeta transition-colors duration-300 hover:bg-violeta/10">
+                  <Icon name="shopping-cart" size={15} /> {cartCount} {cartCount === 1 ? 'item' : 'itens'}
+                </button>
+              )}
+              <button type="button" onClick={() => setStoreExpanded((s) => !s)} data-testid="store-see-all" className="btn-dark !px-5 !py-2.5 text-sm">
+                {storeExpanded ? 'Ver menos produtos' : 'Ver loja completa'} <Icon name="arrow-right" size={16} />
+              </button>
+            </div>
+          </div>
+        </Reveal>
+
+        {storeExpanded && (
+          <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap gap-2">
+              {CATS.map((c) => {
+                const n = c.key === 'todos' ? all.length : all.filter((p) => p.cat === c.key).length;
+                return (
+                  <button key={c.key} type="button" onClick={() => setCat(c.key)} data-testid={'store-cat-' + c.key} aria-pressed={cat === c.key}
+                    className={'tnum rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 ' + (cat === c.key ? 'bg-violeta text-creme' : 'border border-violeta/20 text-violeta/70 hover:border-violeta/50 hover:text-violeta')}>
+                    {c.label} <span className="opacity-60">({n})</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="relative">
+              <Icon name="sort" size={15} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-violeta/50" />
+              <select value={sort} onChange={(e) => setSort(e.target.value)} data-testid="store-sort" aria-label="Ordenar produtos"
+                className="w-auto appearance-none rounded-xl border border-violeta/20 bg-white/70 py-2.5 pl-10 pr-9 text-sm font-semibold text-violeta outline-none focus:border-verde">
+                <option value="relevancia">Relevância</option>
+                <option value="preco-asc">Menor preço</option>
+                <option value="preco-desc">Maior preço</option>
+                <option value="nome">Nome A–Z</option>
+              </select>
+              <Icon name="chevron-down" size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-violeta/50" />
+            </div>
+          </div>
+        )}
+
+        <div className="mt-12 grid grid-cols-2 gap-5 md:gap-6 lg:grid-cols-4">
+          {loading
+            ? [0, 1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse rounded-3xl border border-violeta/10 bg-white/50 p-4" aria-hidden="true">
+                <div className="h-48 rounded-2xl bg-violeta/10" /><div className="mt-4 h-4 w-3/4 rounded bg-violeta/10" /><div className="mt-3 h-9 rounded-full bg-violeta/10" />
+              </div>
+            ))
+            : products.map((p, i) => <Reveal key={p.id} delay={(i % 4) * 0.08}><ProductCard product={p} index={i} /></Reveal>)}
+        </div>
+        {storeExpanded && products.length === 0 && (
+          <p className="mt-8 text-center text-sm text-violeta/60">Nenhum produto nesta categoria ainda — o Critin está negociando com os fornecedores.</p>
+        )}
+        <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-violeta/55">
+          <Icon name="package" size={14} /> Frete grátis em pedidos acima de {formatBRL(FREE_SHIP)} · Envio para todo o Brasil
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 9 · Depoimentos ---------- */
+const AVATAR_HUES = ['#8BE06F', '#c9a2ec', '#E8C56A', '#a8ed96', '#8a4ec2', '#E8C56A'];
+function Testimonials() {
+  return (
+    <section id="depoimentos" className="relative scroll-mt-24 overflow-hidden py-24 md:py-28">
+      <div aria-hidden="true" className="pointer-events-none absolute -right-40 top-16 h-[420px] w-[420px] rounded-full border border-creme/5" />
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+        <Reveal>
+          <div className="max-w-2xl">
+            <Eyebrow icon="star">Depoimentos</Eyebrow>
+            <h2 className="mt-4 font-heading text-4xl font-black tracking-tight text-creme md:text-5xl">Quem já jogou, aprova.</h2>
+            <p className="mt-5 leading-relaxed text-creme/70">Depoimentos ilustrativos de aventureiros sobre como seria jogar pela +1 RPG — em breve, com as histórias reais da comunidade.</p>
+          </div>
+        </Reveal>
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {seedTestimonials.map((t, i) => (
+            <Reveal key={t.name} delay={(i % 3) * 0.08}>
+              <figure className="lift card-surface relative h-full rounded-2xl p-7">
+                <Icon name="quote" size={40} className="absolute right-6 top-6 text-creme/10" />
+                <div className="flex gap-1" role="img" aria-label="Avaliação: 5 de 5 estrelas">
+                  {[0, 1, 2, 3, 4].map((s) => <Icon key={s} name="star" size={16} className="text-verde-light" fill="currentColor" />)}
+                </div>
+                <blockquote className="mt-4 text-[15px] leading-relaxed text-creme/80">“{t.quote}”</blockquote>
+                <figcaption className="mt-5 flex items-center gap-3 border-t border-creme/10 pt-4">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violeta-mid font-heading text-sm font-black text-creme"
+                    style={{ boxShadow: '0 0 0 2px ' + AVATAR_HUES[i % 6] + '55' }}>
+                    {t.name.charAt(0)}
+                  </span>
+                  <span>
+                    <p className="font-heading font-bold text-creme">{t.name}</p>
+                    <p className="mt-0.5 text-sm text-creme/55">{t.detail}</p>
+                  </span>
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 10 · CTA final ---------- */
+const CONFETTI = [
+  { left: '4%', top: '12%', color: '#8BE06F', delay: '0s', w: 8, h: 8, r: 20 }, { left: '14%', top: '68%', color: '#E8C56A', delay: '0.6s', w: 6, h: 12, r: -30 },
+  { left: '26%', top: '4%', color: '#E8C56A', delay: '1.2s', w: 8, h: 8, r: 45 }, { left: '70%', top: '6%', color: '#8BE06F', delay: '0.3s', w: 6, h: 12, r: 10 },
+  { left: '88%', top: '24%', color: '#F7EDE0', delay: '0.9s', w: 7, h: 7, r: 0 }, { left: '92%', top: '62%', color: '#8BE06F', delay: '1.5s', w: 8, h: 8, r: 30 },
+  { left: '78%', top: '84%', color: '#E8C56A', delay: '0.2s', w: 6, h: 12, r: -15 }, { left: '8%', top: '86%', color: '#F7EDE0', delay: '1.1s', w: 6, h: 6, r: 0 },
+  { left: '52%', top: '2%', color: '#a8ed96', delay: '0.8s', w: 7, h: 7, r: 45 }, { left: '38%', top: '90%', color: '#8BE06F', delay: '1.7s', w: 6, h: 10, r: 25 },
+];
+function FinalCTA() {
+  const { openAuth } = useApp();
+  return (
+    <section className="py-24 md:py-28">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-creme/10 bg-gradient-to-br from-violeta-mid to-violeta-deep p-8 sm:p-12 md:p-16">
+            <div aria-hidden="true" className="aurora -right-24 -top-24 h-[380px] w-[380px] bg-verde/15" />
+            <div aria-hidden="true" className="pointer-events-none absolute -left-20 bottom-[-140px] h-[320px] w-[320px] rounded-full border border-creme/5" />
+            <div className="relative grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+              <div className="text-center lg:text-left">
+                <h2 className="font-heading text-4xl font-black leading-[1.05] tracking-tight text-creme md:text-5xl lg:text-6xl">
+                  Com Critin, toda mesa é uma <em className="italic text-verde-light">nova aventura!</em>
+                </h2>
+                <p className="mx-auto mt-6 max-w-xl leading-relaxed text-creme/75 lg:mx-0">Crie sua conta gratuita e deixe o Critin encontrar a mesa perfeita para você.</p>
+                <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
+                  <button type="button" onClick={() => openAuth('signup')} data-testid="final-cta-signup" className="btn-primary w-full sm:w-auto">Criar conta grátis</button>
+                  <a href="#mesas" onClick={(e) => handleAnchor(e, 'mesas')} data-testid="final-cta-explore" className="btn-ghost w-full sm:w-auto"><Icon name="dices" size={18} /> Explorar mesas</a>
+                </div>
+              </div>
+              <div className="relative mx-auto w-56 md:w-72">
+                {CONFETTI.map((c, i) => (
+                  <span key={i} aria-hidden="true" className="absolute animate-twinkle"
+                    style={{ left: c.left, top: c.top, width: c.w, height: c.h, background: c.color, borderRadius: c.w === c.h ? '50%' : '2px', transform: 'rotate(' + c.r + 'deg)', animationDelay: c.delay }} />
+                ))}
+                <div className="animate-float-slow">
+                  <CritinArt pose="celebrate" className="w-full drop-shadow-[0_24px_48px_rgba(18,6,38,0.65)]" label="Critin comemorando com confetes verdes e dourados" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 11 · Dado da Sorte ---------- */
+const WEEK = 7 * 24 * 60 * 60 * 1000;
+const rollKey = (uid) => 'mais1rpg:roll:' + uid;
+const RARITY_STYLE = {
+  Comum: 'border-creme/20 bg-creme/10 text-creme/80', Incomum: 'border-verde/40 bg-verde/15 text-verde-light',
+  Raro: 'border-arcana/50 bg-arcana/20 text-[#c9a2ec]', 'Épico': 'border-ouro/40 bg-ouro/15 text-ouro',
+  'Lendário': 'border-verde-light/50 bg-gradient-to-r from-verde/25 to-arcana/25 text-verde-soft',
+};
+const RARITY_LEGEND = [['1–5', 'Comum'], ['6–10', 'Incomum'], ['11–15', 'Raro'], ['16–19', 'Épico'], ['20', 'Lendário']];
+const BURST = Array.from({ length: 14 }, (_, i) => {
+  const a = (i / 14) * Math.PI * 2, d = 95 + (i % 3) * 24;
+  return { x: Math.cos(a) * d, y: Math.sin(a) * d, color: ['#8BE06F', '#E8C56A', '#F7EDE0', '#c9a2ec'][i % 4] };
+});
+function LuckDice() {
+  const { user, openAuth, pushToast, equipCosmetic } = useApp();
+  const reduce = useReducedMotion();
+  const [stored, setStored] = React.useState(null);
+  const [rolling, setRolling] = React.useState(false);
+  const [display, setDisplay] = React.useState(20);
+  const [burst, setBurst] = React.useState(false);
+  const [now, setNow] = React.useState(Date.now());
+  const flickRef = React.useRef(null); const timersRef = React.useRef([]); const aliveRef = React.useRef(true);
+  React.useEffect(() => {
+    aliveRef.current = true;
+    return () => { aliveRef.current = false; clearInterval(flickRef.current); timersRef.current.forEach(clearTimeout); };
+  }, []);
+  React.useEffect(() => {
+    if (!user) { setStored(null); setDisplay(20); return; }
+    const parsed = readJSON(rollKey(user.id), null);
+    setStored(parsed);
+    if (parsed && parsed.value) setDisplay(parsed.value);
+  }, [user]);
+  const remaining = stored ? stored.at + WEEK - now : 0;
+  const cooldown = remaining > 0;
+  React.useEffect(() => {
+    if (!cooldown) return;
+    const id = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(id);
+  }, [cooldown]);
+  const days = Math.max(0, Math.floor(remaining / 86400000));
+  const hours = Math.max(0, Math.floor((remaining % 86400000) / 3600000));
+  const mins = Math.max(0, Math.floor((remaining % 3600000) / 60000));
+  const equipped = user && user.cosmetic && stored && stored.cosmetic && user.cosmetic.name === stored.cosmetic.name;
+  const roll = React.useCallback(async () => {
+    if (rolling) return;
+    if (!user) { openAuth('login'); return; }
+    if (cooldown) return;
+    setRolling(true); setBurst(false);
+    flickRef.current = setInterval(() => setDisplay(1 + Math.floor(Math.random() * 20)), 80);
+    const minSpin = new Promise((r) => setTimeout(r, reduce ? 350 : 1600));
+    const remote = apiPost('/api/cosmetics/roll', {})
+      .then((r) => { const v = r && (r.value ?? r.roll); if (!v) return null; return { value: v, cosmetic: r.cosmetic && r.cosmetic.name ? r.cosmetic : localCosmetic(v) }; })
+      .catch((err) => {
+        if (err && err.status === 429) {
+          const next = err.body && err.body.next_roll_at ? Date.parse(err.body.next_roll_at) : NaN;
+          return { blocked: true, message: (err.body && err.body.message) || 'Sua rolagem semanal já foi usada.', at: Number.isFinite(next) ? next - WEEK : Date.now() };
+        }
+        return null;
+      });
+    const [result] = await Promise.all([remote, minSpin]);
+    clearInterval(flickRef.current);
+    if (!aliveRef.current) return;
+    let record;
+    if (result && result.blocked) {
+      const prev = readJSON(rollKey(user.id), null);
+      record = { value: prev ? prev.value : null, cosmetic: prev ? prev.cosmetic : null, at: result.at, message: result.message };
+    } else {
+      const value = (result && result.value) || (1 + Math.floor(Math.random() * 20));
+      record = { value, cosmetic: (result && result.cosmetic) || localCosmetic(value), at: Date.now() };
+    }
+    setStored(record); setNow(Date.now());
+    if (record.value) setDisplay(record.value);
+    try { localStorage.setItem(rollKey(user.id), JSON.stringify(record)); } catch (e) { /* sem armazenamento */ }
+    setRolling(false);
+    if (result && result.blocked) pushToast(result.message);
+    else {
+      setBurst(true);
+      timersRef.current.push(setTimeout(() => aliveRef.current && setBurst(false), 1200));
+      pushToast('Você rolou ' + record.value + '! ' + record.cosmetic.name + ' desbloqueado.');
+    }
+  }, [rolling, user, cooldown, reduce, openAuth, pushToast]);
+  const legend = rolling ? 'Rolando...' : !user || !cooldown ? 'Clique para rolar' : 'Volte na próxima semana';
+  return (
+    <section id="dado-da-sorte" className="relative scroll-mt-24 overflow-hidden border-y border-creme/10 bg-grafite py-24 md:py-28">
+      <div aria-hidden="true" className="aurora -left-32 top-0 h-[400px] w-[400px] bg-arcana/15" />
+      <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 sm:px-8 lg:grid-cols-2">
+        <Reveal>
+          <Eyebrow icon="sparkles">Cosméticos do perfil</Eyebrow>
+          <h2 className="mt-4 font-heading text-4xl font-black tracking-tight text-creme md:text-5xl">Role o Dado da Sorte.</h2>
+          <p className="mt-5 max-w-xl leading-relaxed text-creme/70">Uma rolagem por semana: quanto mais alto o número, mais raro o cosmético — molduras, cores e banners para deixar o seu perfil com a sua cara.</p>
+          <div className="mt-8 min-h-[150px]" aria-live="polite">
+            <AnimatePresence mode="wait">
+              {!user ? (
+                <motion.div key="locked" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4 }} data-testid="luck-dice-state-locked">
+                  <p className="leading-relaxed text-creme/75">Entre com sua conta para rolar — cada aventureiro tem 1 rolagem por semana.</p>
+                  <button type="button" onClick={() => openAuth('login')} data-testid="luck-dice-login" className="btn-ghost mt-5 !px-5 !py-2.5 text-sm">Entrar na conta</button>
+                </motion.div>
+              ) : rolling ? (
+                <motion.div key="rolling" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-4" data-testid="luck-dice-state-rolling">
+                  <CritinArt mood="pensando" dice={false} className="w-14 shrink-0 animate-float-slow" label="Critin pensando enquanto o dado gira" />
+                  <p className="font-heading text-lg font-bold text-verde-soft">Os destinos estão girando...</p>
+                </motion.div>
+              ) : stored ? (
+                <motion.div key="result" initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} data-testid="luck-dice-state-result">
+                  {cooldown && (
+                    <div className="mb-5 flex items-center gap-3" data-testid="luck-dice-state-cooldown">
+                      <CritinArt mood="descansando" dice={false} className="w-12 shrink-0" label="Critin descansando até a próxima rolagem semanal" />
+                      <p className="flex items-start gap-2.5 text-sm leading-relaxed text-creme/65">
+                        <Icon name="clock" size={16} className="mt-0.5 shrink-0 text-ouro" />
+                        {stored.message || ('Sua rolagem semanal já foi usada — o dado recarrega em ' + days + (days === 1 ? ' dia' : ' dias') + ', ' + hours + ' h e ' + mins + ' min.')}
+                      </p>
+                    </div>
+                  )}
+                  {stored.value != null && (
+                    <div className="flex items-center gap-6">
+                      <span className="tnum font-heading text-6xl font-black text-verde-light drop-shadow-[0_0_24px_rgba(139,224,111,0.45)] md:text-7xl">{stored.value}</span>
+                      <div>
+                        <p className="font-heading text-xl font-bold text-creme">{stored.cosmetic && stored.cosmetic.name}</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <span className="chip">{stored.cosmetic && stored.cosmetic.type}</span>
+                          <span className={'chip ' + (RARITY_STYLE[stored.cosmetic && stored.cosmetic.rarity] || RARITY_STYLE.Comum)}>{stored.cosmetic && stored.cosmetic.rarity}</span>
+                        </div>
+                        <button type="button" data-testid="luck-dice-equip" disabled={equipped}
+                          onClick={() => equipCosmetic(stored.cosmetic)}
+                          className={'mt-3 inline-flex items-center gap-1.5 text-sm font-semibold underline-offset-4 ' + (equipped ? 'text-verde-soft' : 'text-verde-light hover:underline')}>
+                          <Icon name={equipped ? 'check' : 'sparkles'} size={14} />
+                          {equipped ? 'Equipado no seu perfil.' : 'Equipe no seu perfil.'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.p key="ready" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }} className="font-heading text-lg font-bold text-creme" data-testid="luck-dice-state-ready">
+                  Sua rolagem semanal te espera. O que os destinos reservam?
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-2" aria-label="Tabela de raridades">
+            {RARITY_LEGEND.map(([range, label]) => (
+              <span key={label} className={'chip tnum ' + (RARITY_STYLE[label] || '')}>{range} · {label}</span>
+            ))}
+          </div>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div className="relative flex flex-col items-center gap-6">
+            <div aria-hidden="true" className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-verde/15 blur-[90px]" />
+            <div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 animate-spin-slow rounded-full border border-dashed border-creme/10" />
+            <div className="relative">
+              {burst && BURST.map((b, i) => (
+                <motion.span key={i} aria-hidden="true" className="absolute left-1/2 top-1/2 h-2 w-2 rounded-sm" style={{ background: b.color }}
+                  initial={{ x: 0, y: 0, opacity: 1, scale: 0.6 }} animate={{ x: b.x, y: b.y, opacity: 0, scale: 1.2, rotate: 120 }}
+                  transition={{ duration: 0.9, delay: i * 0.012, ease: 'easeOut' }} />
+              ))}
+              <motion.button type="button" onClick={roll} disabled={rolling || (Boolean(user) && cooldown)} data-testid="luck-dice-roll"
+                aria-label={rolling ? 'Rolando o Dado da Sorte' : 'Rolar o Dado da Sorte'}
+                whileHover={!rolling && !(user && cooldown) && !reduce ? { rotate: 45, scale: 1.05 } : undefined}
+                whileTap={!rolling ? { scale: 0.96 } : undefined}
+                transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                className="relative block rounded-full disabled:cursor-not-allowed disabled:opacity-80">
+                <span className={'block ' + (rolling ? 'animate-spin' : '')}><D20Svg size={176} value={display} variant="luck" /></span>
+              </motion.button>
+            </div>
+            <p className="font-heading text-sm font-bold text-creme/70">{legend}</p>
+            <p className="text-xs text-creme/45">1 rolagem por semana · cosméticos exclusivos para o seu perfil</p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- 12 · Footer ---------- */
+const DOCS = {
+  diretrizes: { title: 'Diretrizes da comunidade', body: [
+    'A +1 RPG existe para conectar pessoas. Toda mesa deve ser um espaço seguro e acolhedor: respeito acima de qualquer regra de sistema.',
+    'Mestres declaram faixa etária, temas sensíveis e estilo de jogo antes da primeira sessão. Jogadores combinam horários e avisam ausências com antecedência.',
+    'Discriminação, assédio ou spoilers maliciosos resultam em remoção da plataforma. O Critin cuida de quem cuida da mesa.',
+  ] },
+  trabalhe: { title: 'Trabalhe conosco', body: [
+    'Somos um time pequeno e apaixonado por RPG de mesa, construindo a ponte entre Mestres e jogadores no Brasil.',
+    'Buscamos pessoas de produto, engenharia e comunidade que joguem — ou queiram aprender. Remoto, com encontros presenciais opcionais (e dados na mesa).',
+    'Envie seu portfólio para talentos@mais1rpg.com.br com o assunto "Quero ser +1".',
+  ] },
+  termos: { title: 'Termos de Uso', body: [
+    'Ao criar uma conta na +1 RPG você concorda em usar a plataforma para organizar e participar de mesas de RPG de mesa, respeitando as diretrizes da comunidade.',
+    'Planos pagos são assinaturas mensais canceláveis a qualquer momento; itens físicos da loja seguem a política de trocas do Código de Defesa do Consumidor.',
+    'Cosméticos do Dado da Sorte são itens digitais de perfil, sem valor monetário, concedidos no máximo uma vez por semana por conta.',
+    '© 2026 +1 RPG · Todos os direitos reservados.',
+  ] },
+};
+function Newsletter() {
+  const { pushToast } = useApp();
+  const [email, setEmail] = React.useState('');
+  const [done, setDone] = React.useState(false);
+  const submit = (e) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setDone(true);
+    pushToast('Inscrição confirmada! O Critin vai te manter por dentro das novidades.');
+  };
+  if (done) return (
+    <p className="mt-5 flex items-center gap-2 rounded-xl border border-verde/30 bg-verde/10 px-4 py-3 text-sm font-semibold text-verde-light" role="status">
+      <Icon name="check" size={16} /> Inscrição confirmada. Até a próxima novidade!
+    </p>
+  );
+  return (
+    <form onSubmit={submit} className="mt-5">
+      <label htmlFor="news-email" className="text-xs font-semibold uppercase tracking-[0.2em] text-verde-soft">Novidades da guilda</label>
+      <div className="mt-2 flex gap-2">
+        <input id="news-email" data-testid="newsletter-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+          placeholder="seu@email.com" className="input !py-2.5 text-sm" />
+        <button type="submit" data-testid="newsletter-submit" aria-label="Assinar novidades"
+          className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-verde text-creme transition-colors duration-300 hover:bg-[#2f9a22]">
+          <Icon name="send" size={17} />
+        </button>
+      </div>
+    </form>
+  );
+}
+function Footer() {
+  const { assetsReady } = useApp();
+  const [doc, setDoc] = React.useState(null);
+  const [logoFailed, setLogoFailed] = React.useState(false);
+  const closeDoc = React.useCallback(() => setDoc(null), []);
+  const NAV = [{ label: 'Mesas', target: 'mesas' }, { label: 'Planos', target: 'planos' }, { label: 'Loja', target: 'loja' }, { label: 'Comunidade', target: 'depoimentos' }];
+  const HELP = [{ label: 'Diretrizes', key: 'diretrizes' }, { label: 'Trabalhe conosco', key: 'trabalhe' }, { label: 'Termos de Uso', key: 'termos' }];
+  const SOCIAL = [{ icon: 'facebook', label: 'Facebook', href: 'https://facebook.com/mais1rpg' }, { icon: 'instagram', label: 'Instagram', href: 'https://instagram.com/mais1rpg' }, { icon: 'message-circle', label: 'WhatsApp', href: 'https://wa.me/' }];
+  return (
+    <footer className="border-t border-creme/10 bg-violeta-darker pb-10 pt-16">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
+          <div>
+            {assetsReady && !logoFailed ? (
+              <img src="/logo-plus1rpg.png" alt="Logo da +1 RPG: dado d20 violeta com fita verde e o nome da marca em creme"
+                className="w-44 rounded-2xl bg-creme p-3" loading="lazy" onError={() => setLogoFailed(true)} />
+            ) : (
+              <div className="inline-flex items-center gap-3 rounded-2xl bg-creme px-5 py-4">
+                <D20Svg size={52} />
+                <span className="font-heading text-2xl font-black tracking-tight text-violeta">+1 <span className="text-verde">RPG</span></span>
+              </div>
+            )}
+            <p className="mt-5 max-w-xs leading-relaxed text-creme/60">Mais uma pessoa. Mais uma aventura.</p>
+            <div className="mt-6 flex gap-3">
+              {SOCIAL.map(({ icon, label, href }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label + ' da +1 RPG'} data-testid={'footer-social-' + label.toLowerCase()}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-creme/15 text-creme/70 transition-colors duration-300 hover:border-verde-light hover:text-verde-light">
+                  <Icon name={icon} size={17} />
+                </a>
+              ))}
+            </div>
+            <Newsletter />
+          </div>
+          <nav aria-label="Navegação do rodapé">
+            <h3 className="font-heading text-sm font-bold uppercase tracking-[0.2em] text-verde-soft">Navegação</h3>
+            <ul className="mt-5 space-y-3">
+              {NAV.map((l) => (
+                <li key={l.label}>
+                  <a href={'#' + l.target} onClick={(e) => handleAnchor(e, l.target)} data-testid={'footer-link-' + l.label.toLowerCase()} className="text-creme/65 transition-colors duration-300 hover:text-verde-light">{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <nav aria-label="Ajuda">
+            <h3 className="font-heading text-sm font-bold uppercase tracking-[0.2em] text-verde-soft">Ajuda</h3>
+            <ul className="mt-5 space-y-3">
+              {HELP.map((l) => (
+                <li key={l.key}>
+                  <button type="button" onClick={() => setDoc(l.key)} data-testid={'footer-link-' + l.key} className="text-creme/65 transition-colors duration-300 hover:text-verde-light">{l.label}</button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-creme/10 pt-8 sm:flex-row">
+          <p className="text-sm text-creme/50">© 2026 +1 RPG · Todos os direitos reservados</p>
+          <button type="button" onClick={() => setDoc('termos')} data-testid="footer-terms" className="text-sm text-creme/60 underline-offset-4 transition-colors duration-300 hover:text-verde-light hover:underline">Termos de Uso</button>
+        </div>
+      </div>
+      <ModalShell open={!!doc} onClose={closeDoc} labelledBy="doc-title" wide>
+        {doc && (
+          <div>
+            <LogoMark size={40} />
+            <h2 id="doc-title" className="mt-4 font-heading text-2xl font-black tracking-tight text-creme">{DOCS[doc].title}</h2>
+            <div className="mt-4 space-y-4">
+              {DOCS[doc].body.map((p, i) => <p key={i} className="leading-relaxed text-creme/75">{p}</p>)}
+            </div>
+          </div>
+        )}
+      </ModalShell>
+    </footer>
+  );
+}
+
+/* ---------- Progresso de scroll + voltar ao topo ---------- */
+function ScrollProgress() {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      const p = h > 0 ? Math.min(1, window.scrollY / h) : 0;
+      if (ref.current) ref.current.style.transform = 'scaleX(' + p + ')';
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); if (raf) cancelAnimationFrame(raf); };
+  }, []);
+  return <div aria-hidden="true" className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-verde via-verde-light to-arcana" style={{ transform: 'scaleX(0)' }} ref={ref} />;
+}
+function BackToTop() {
+  const [show, setShow] = React.useState(false);
+  React.useEffect(() => {
+    const onScroll = () => setShow(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.button key="btt" type="button" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
+          transition={{ duration: 0.3 }} onClick={() => scrollToId('topo')} data-testid="back-to-top" aria-label="Voltar ao topo"
+          className="glass fixed bottom-5 left-5 z-40 flex h-12 w-12 items-center justify-center rounded-full text-creme/80 transition-colors duration-300 hover:text-verde-light">
+          <Icon name="arrow-up" size={19} />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ---------- App ---------- */
+function App() {
+  React.useEffect(() => initLenis(), []);
+  return (
+    <AppProvider>
+      <a href="#conteudo" data-testid="skip-link"
+        className="fixed left-4 top-0 z-[100] -translate-y-full rounded-b-xl bg-verde px-4 py-2 font-heading font-bold text-creme transition-transform duration-300 focus:translate-y-0">
+        Pular para o conteúdo
+      </a>
+      <ScrollProgress />
+      <Navbar />
+      <main id="conteudo">
+        <Hero />
+        <Stats />
+        <Marquee />
+        <Modes />
+        <Themes />
+        <FeaturedTables />
+        <Plans />
+        <Store />
+        <Testimonials />
+        <FinalCTA />
+        <LuckDice />
+      </main>
+      <Footer />
+      <BackToTop />
+      <AuthModal />
+      <PublishModal />
+      <CartDrawer />
+      <NijiasModal />
+      <Toasts />
+    </AppProvider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
